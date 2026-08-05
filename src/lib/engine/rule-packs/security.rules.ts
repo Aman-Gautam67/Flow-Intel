@@ -19,7 +19,7 @@ const SECRET_PATTERNS: Array<{ re: RegExp; label: string }> = [
   { re: /xox[baprs]-[0-9A-Za-z-]{10,80}/, label: "Slack token" },
   { re: /\b(ghp_|github_pat_)[A-Za-z0-9_]{30,100}\b/, label: "GitHub token" },
   { re: /\bAKIA[0-9A-Z]{16}\b/, label: "AWS Access Key" },
-  { re: /\bsk_(?:live|test)_[A-Za-z0-9]{24,}\b/, label: "Stripe secret key" },
+  { re: /\bsk_(?:live|test)_[A-Za-z0-9]{9,}\b/, label: "Stripe secret key" },
   { re: /["'](password|secret|apiKey|api_key)["']\s*:\s*["'](?!\{\{)[A-Za-z0-9_\-]{12,}["']/i, label: "Hardcoded secret" },
 ];
 

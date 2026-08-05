@@ -108,11 +108,20 @@ export function adaptToLegacyScoreBreakdown(report: AnalysisReport): ScoreBreakd
   // Memory score = PERFORMANCE (closest proxy for resource efficiency)
   const memoryScore = performance ?? 100;
 
-  // AI Guardrails = derived from SECURITY/PRIVACY findings about AI nodes
-  const aiFindings = findings.filter(
-    (f) => f.category === "PRIVACY" &&
-      (f.ruleId === "PRV-001" || f.ruleId.startsWith("SEC") && f.location.nodeType?.toLowerCase().includes("langchain"))
-  );
+  // AI Guardrails = derived from AI-specific findings across safety, reliability,
+  // performance, privacy, and cost categories. Restrict generic SEC/REL/PER rules
+  // to findings located on AI node types to avoid penalizing non-AI workflow issues.
+  const aiFindings = findings.filter((f) => {
+    const nodeType = f.location.nodeType?.toLowerCase() ?? "";
+    const isAiNodeFinding = /langchain|openai|anthropic|llm|chatmodel|agent/.test(nodeType);
+    return isAiNodeFinding && (
+      f.ruleId.startsWith("SEC-") ||
+      f.ruleId.startsWith("REL-") ||
+      f.ruleId.startsWith("PER-") ||
+      f.ruleId.startsWith("PRV-") ||
+      f.ruleId.startsWith("COST-")
+    );
+  });
   const hasAiNodes = report.ast.aiNodesCount > 0;
   const aiGuardrailsScore = hasAiNodes
     ? Math.max(0, 100 - aiFindings.reduce((s, f) => s + f.penaltyPoints, 0))

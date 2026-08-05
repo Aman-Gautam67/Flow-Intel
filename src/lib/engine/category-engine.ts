@@ -23,7 +23,11 @@
 import type { Finding, RuleCategory, CategoryScore } from "./types";
 
 const PASS_THRESHOLD = 70;
-const PER_RULE_MAX_DEDUCTION = 40;
+const DEFAULT_PER_RULE_MAX_DEDUCTION = 40;
+const PER_RULE_MAX_DEDUCTION_BY_SEVERITY: Partial<Record<Finding["severity"], number>> = {
+  INFO: 5,
+  MEDIUM: 25,
+};
 const REPEAT_PENALTY_MULTIPLIER = 0.5;
 
 const ALL_CATEGORIES: RuleCategory[] = [
@@ -66,12 +70,13 @@ export function computeCategoryScores(
     for (const finding of catFindings) {
       if (!finding.penaltyPoints || finding.penaltyPoints <= 0) continue;
       const alreadyDeducted = ruleDeductions.get(finding.ruleId) ?? 0;
-      const remaining = PER_RULE_MAX_DEDUCTION - alreadyDeducted;
+      const maxDeduction = PER_RULE_MAX_DEDUCTION_BY_SEVERITY[finding.severity] ?? DEFAULT_PER_RULE_MAX_DEDUCTION;
+      const remaining = maxDeduction - alreadyDeducted;
       if (remaining <= 0) continue;
       // Diminishing returns for repeated findings from same rule
       const isRepeat = alreadyDeducted > 0;
       const raw = isRepeat
-        ? Math.floor(finding.penaltyPoints * REPEAT_PENALTY_MULTIPLIER)
+        ? Math.round(finding.penaltyPoints * REPEAT_PENALTY_MULTIPLIER)
         : finding.penaltyPoints;
       const applied = Math.min(raw, remaining);
       ruleDeductions.set(finding.ruleId, alreadyDeducted + applied);
@@ -200,5 +205,6 @@ export function computeOverallFqi(categoryScores: CategoryScore[]): number {
   }
 
   if (totalWeight === 0) return 100;
-  return Math.round(weightedSum / totalWeight);
+  const average = weightedSum / totalWeight;
+  return average >= 99.999 ? 100 : Math.floor(average);
 }
