@@ -226,10 +226,7 @@ export function DimensionPopover({ meta, score }: DimensionPopoverProps) {
   const [position, setPosition] = useState<PanelPosition>({ top: 0, left: 0, placement: "below" });
   const triggerRef              = useRef<HTMLButtonElement>(null);
   const hoverTimerRef           = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [mounted, setMounted]   = useState(false);
-
-  // Portal needs document — only mount client-side
-  useEffect(() => { setMounted(true); }, []);
+  const [mounted] = useState(() => typeof document !== "undefined");
 
   const computePosition = useCallback(() => {
     if (!triggerRef.current) return;

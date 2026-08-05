@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useRef, useCallback } from "react";
 import { fi } from "@/lib/toast";
 import type { WorkflowScore, WorkflowAnalysisV2 } from "@/lib/db/schema";
@@ -222,14 +223,14 @@ export function WorkflowDashboard({
       {/* Nav */}
       <nav className="flex items-center px-5 py-2.5"
         style={{ borderBottom: "1px solid var(--color-fi-border)", background: "rgba(10,10,10,0.96)" }}>
-        <a href="/" className="flex items-center gap-3 w-48">
+        <Link href="/" className="flex items-center gap-3 w-48">
           <div className="w-7 h-7 border flex items-center justify-center text-[var(--color-fi-accent)] font-mono font-bold text-xs"
             style={{ borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.04)" }}>FI</div>
           <span className="font-mono text-sm tracking-[0.18em] uppercase">FlowIntel</span>
-        </a>
+        </Link>
         <div className="flex-1 flex items-center justify-center gap-8 font-mono text-[11px] tracking-widest uppercase" style={{ color: "var(--color-fi-muted)" }}>
-          <a href="/search" className="hover:text-[var(--color-fi-text)] transition-colors">Catalog</a>
-          <a href="/upload" className="hover:text-[var(--color-fi-text)] transition-colors">Analyze</a>
+          <Link href="/search" className="hover:text-[var(--color-fi-text)] transition-colors">Catalog</Link>
+          <Link href="/upload" className="hover:text-[var(--color-fi-text)] transition-colors">Analyze</Link>
         </div>
         <div className="w-48" />
       </nav>
@@ -676,7 +677,7 @@ export function WorkflowDashboard({
                           </p>
                           <p className="font-sans text-[12px] leading-relaxed" style={{ color: "var(--color-fi-muted)" }}>
                             Community nodes are third-party npm packages with no official n8n verification.
-                            Review each package's source code and npm page before sharing with production teams.
+                            Review each package&apos;s source code and npm page before sharing with production teams.
                           </p>
                         </div>
                       </div>

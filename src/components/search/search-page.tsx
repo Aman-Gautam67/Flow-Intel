@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Search, Loader2, X, SlidersHorizontal } from "lucide-react";
 import type { WorkflowListItem } from "@/lib/api/workflows";
@@ -117,14 +118,14 @@ export function SearchPage() {
       {/* Nav */}
       <nav className="flex items-center px-5 py-2.5"
         style={{ borderBottom: "1px solid var(--color-fi-border)", background: "rgba(10,10,10,0.96)" }}>
-        <a href="/" className="flex items-center gap-3 w-48">
+        <Link href="/" className="flex items-center gap-3 w-48">
           <div className="w-6 h-6 border flex items-center justify-center font-mono font-bold text-s"
             style={{ borderColor: "rgba(255,255,255,0.28)", background: "rgba(255,255,255,0.04)", color: "var(--color-fi-accent)" }}>FI</div>
           <span className="font-mono text-sm tracking-[0.3em] uppercase hidden sm:block">FlowIntel</span>
-        </a>
+        </Link>
         <div className="flex-1 flex items-center justify-center gap-8 font-mono text-[11px] tracking-widest uppercase" style={{ color: "var(--color-fi-muted)" }}>
-          <a href="/search" className="text-[var(--color-fi-accent)]">Catalog</a>
-          <a href="/upload" className="hover:text-[var(--color-fi-text)] transition-colors">Analyze</a>
+          <Link href="/search" className="text-[var(--color-fi-accent)]">Catalog</Link>
+          <Link href="/upload" className="hover:text-[var(--color-fi-text)] transition-colors">Analyze</Link>
         </div>
         <div className="w-40 flex justify-end">
           {/* Mobile sidebar toggle */}

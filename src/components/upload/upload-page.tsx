@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Terminal, Upload, FileJson, AlertCircle, CheckCircle2, Shield, Activity, Plus } from "lucide-react";
 import type { AnalysisResult } from "@/types";
@@ -172,16 +173,16 @@ export function UploadPage() {
   return (
     <div className="min-h-svh">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center px-5 py-2.5"
-        style={{ borderBottom: "1px solid var(--color-fi-border)", background: "rgba(10,10,10,0.82)", backdropFilter: "blur(12px)" }}>
-        <a href="/" className="flex items-center gap-3 w-48">
+      <nav className="flex items-center px-5 py-2.5"
+        style={{ borderBottom: "1px solid var(--color-fi-border)", background: "rgba(10,10,10,0.96)" }}>
+        <Link href="/" className="flex items-center gap-3 w-48">
           <div className="w-7 h-7 border flex items-center justify-center text-[var(--color-fi-accent)] font-mono font-bold text-xs"
             style={{ borderColor: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.04)" }}>FI</div>
           <span className="font-mono text-sm tracking-[0.18em] uppercase">FlowIntel</span>
-        </a>
+        </Link>
         <div className="flex-1 flex items-center justify-center gap-8 font-mono text-[11px] tracking-widest uppercase" style={{ color: "var(--color-fi-muted)" }}>
-          <a href="/search" className="hover:text-[var(--color-fi-text)] transition-colors">Catalog</a>
-          <a href="/upload" className="text-[var(--color-fi-accent)]">Analyze</a>
+          <Link href="/search" className="hover:text-[var(--color-fi-text)] transition-colors">Catalog</Link>
+          <Link href="/upload" className="text-[var(--color-fi-accent)]">Analyze</Link>
         </div>
         <div className="w-48" />
       </nav>

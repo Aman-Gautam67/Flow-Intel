@@ -35,6 +35,33 @@ const CERTIFICATION_VERSION = "2.0.0";
 // Gates required to issue a certificate
 const REQUIRED_PASSING_GATES = new Set(["MARKETPLACE_GATE", "PRODUCTION_GATE"]);
 
+export type CertificationLevel =
+  | "ENTERPRISE_READY"
+  | "CERTIFIED"
+  | "MARKETPLACE_READY"
+  | "NOT_CERTIFIED";
+
+/**
+ * Derive the public certification level from evaluated quality gates.
+ * Enterprise readiness requires every gate, certification requires marketplace
+ * and production gates, and marketplace readiness requires only marketplace.
+ */
+export function deriveCertificationLevel(gateResults: QualityGateResult[]): CertificationLevel {
+  const passed = (gateName: QualityGateResult["gate"]) =>
+    gateResults.find((gate) => gate.gate === gateName)?.passed === true;
+
+  if (gateResults.length > 0 && gateResults.every((gate) => gate.passed)) {
+    return "ENTERPRISE_READY";
+  }
+  if (passed("MARKETPLACE_GATE") && passed("PRODUCTION_GATE")) {
+    return "CERTIFIED";
+  }
+  if (passed("MARKETPLACE_GATE")) {
+    return "MARKETPLACE_READY";
+  }
+  return "NOT_CERTIFIED";
+}
+
 /**
  * Attempt to issue a FlowIntel Certified™ certificate.
  *
