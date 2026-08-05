@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Search, FileJson, GitBranch, Download, AlertTriangle } from "lucide-react";
 
 interface Command {
@@ -17,6 +18,7 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({ onExportAudit, onJumpToCrit }: CommandPaletteProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -24,15 +26,15 @@ export function CommandPalette({ onExportAudit, onJumpToCrit }: CommandPalettePr
   const commands: Command[] = [
     {
       id: "search", label: "Search workflows", shortcut: "/",
-      icon: Search, action: () => { window.location.href = "/search"; setOpen(false); },
+      icon: Search, action: () => { router.push("/search"); setOpen(false); },
     },
     {
       id: "upload", label: "Analyze new workflow", shortcut: "U",
-      icon: FileJson, action: () => { window.location.href = "/upload"; setOpen(false); },
+      icon: FileJson, action: () => { router.push("/upload"); setOpen(false); },
     },
     {
       id: "catalog", label: "Browse catalog",
-      icon: GitBranch, action: () => { window.location.href = "/search"; setOpen(false); },
+      icon: GitBranch, action: () => { router.push("/search"); setOpen(false); },
     },
     ...(onExportAudit ? [{
       id: "export", label: "Export security audit (Markdown / CSV)", shortcut: "E",
@@ -57,7 +59,7 @@ export function CommandPalette({ onExportAudit, onJumpToCrit }: CommandPalettePr
       // ⌘/Ctrl+K — open palette
       if (mod && e.key === "k")  { e.preventDefault(); open_(); return; }
       // ⌘/Ctrl+U — go to upload
-      if (mod && e.key === "u")  { e.preventDefault(); window.location.href = "/upload"; return; }
+      if (mod && e.key === "u")  { e.preventDefault(); router.push("/upload"); return; }
       // ⌘/Ctrl+E — export audit
       if (mod && e.key === "e" && onExportAudit) { e.preventDefault(); onExportAudit(); return; }
       // ⌘/Ctrl+Shift+F — jump to CRIT
@@ -68,7 +70,7 @@ export function CommandPalette({ onExportAudit, onJumpToCrit }: CommandPalettePr
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [open_, close, onExportAudit, onJumpToCrit]);
+  }, [open_, close, onExportAudit, onJumpToCrit, router]);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
