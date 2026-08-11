@@ -32,9 +32,9 @@ export function EngineDetailsSection() {
       {/* ── Categories ── */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <span className="font-mono text-[10px] tracking-[0.22em] uppercase" style={{ color: "rgba(240,240,240,0.45)" }}>
-            10 Scoring Categories · 252 Rules Total
-          </span>
+          <p className="text-sm font-semibold tracking-wider text-[#FF6B00] uppercase mb-3">
+          10 Scoring Categories • 402 Rules Total
+        </p>
           <span className="font-mono text-[9px] tracking-[0.18em] uppercase px-2 py-1 border"
             style={{ borderColor: "rgba(0,255,136,0.25)", color: "var(--color-fi-accent)", background: "rgba(0,255,136,0.05)" }}>
             v2 Engine

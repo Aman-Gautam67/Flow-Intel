@@ -9,6 +9,7 @@ import { AstLoader } from "./ast-loader";
 import { ImportModal } from "./import-modal";
 import { BulkWorkspace, type BulkEntry } from "./bulk-workspace";
 import { LiveDiffView } from "../workflow/live-diff-view";
+import { InlineReportPanel } from "./inline-report-panel";
 
 type UploadState = "idle" | "dragging" | "parsing" | "saving" | "done" | "error";
 
@@ -24,7 +25,18 @@ function scoreColor(score: number): string {
   return "#ff5d5d";
 }
 
-function MiniRing({ score, label }: { score: number; label: string }) {
+function MiniRing({ score, label }: { score: number | null | undefined; label: string }) {
+  if (score === null || score === undefined) {
+    return (
+      <div className="flex flex-col items-center gap-1">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle cx="28" cy="28" r={22} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="5" strokeDasharray="4 4" />
+          <text x="28" y="32" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.4)" fontFamily="var(--font-mono)">N/A</text>
+        </svg>
+        <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: "var(--color-fi-muted)" }}>{label}</span>
+      </div>
+    );
+  }
   const r = 22; const circ = 2 * Math.PI * r;
   const dash = (score / 100) * circ;
   const color = scoreColor(score);
@@ -63,6 +75,7 @@ export function UploadPage() {
   const [savePublic, setSavePublic] = useState(true);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showDiff, setShowDiff] = useState(false);
+  const [showInlineReport, setShowInlineReport] = useState(false);
 
   // Bulk mode
   const [bulkEntries, setBulkEntries] = useState<BulkEntry[]>([]);
@@ -302,12 +315,18 @@ export function UploadPage() {
             )}
             <div className="flex items-center justify-between">
               <h2 className="font-sans font-light text-xl tracking-tight">{report.result.parsed.name}</h2>
-              {report.slug && (
+              {report.slug ? (
                 <a href={`/workflows/${report.slug}`}
                   className="h-9 px-5 flex items-center gap-2 border font-mono text-[10px] uppercase tracking-[0.1em] transition-all hover:bg-[var(--color-fi-accent)] hover:border-[var(--color-fi-accent)] hover:text-black"
                   style={{ borderColor: "rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.04)", color: "var(--color-fi-text)" }}>
                   <Activity size={12} /> Full Report →
                 </a>
+              ) : (
+                <button onClick={() => setShowInlineReport(true)}
+                  className="h-9 px-5 flex items-center gap-2 border font-mono text-[10px] uppercase tracking-[0.1em] transition-all hover:bg-[var(--color-fi-accent)] hover:border-[var(--color-fi-accent)] hover:text-black"
+                  style={{ borderColor: "rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.04)", color: "var(--color-fi-text)" }}>
+                  <Activity size={12} /> View Report Details
+                </button>
               )}
             </div>
             {/* Score rings */}
@@ -369,12 +388,18 @@ export function UploadPage() {
             </div>
             {/* CTA */}
             <div className="flex gap-3 flex-wrap">
-              {report.slug && (
+              {report.slug ? (
                 <a href={`/workflows/${report.slug}`}
                   className="h-11 px-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.1em] transition-all hover:scale-[1.02]"
                   style={{ background: "var(--color-fi-accent)", color: "#090909", border: "1px solid var(--color-fi-accent)" }}>
                   <Shield size={13} /> Full Intelligence Report
                 </a>
+              ) : (
+                <button onClick={() => setShowInlineReport(true)}
+                  className="h-11 px-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.1em] transition-all hover:scale-[1.02]"
+                  style={{ background: "var(--color-fi-accent)", color: "#090909", border: "1px solid var(--color-fi-accent)" }}>
+                  <Shield size={13} /> Full Intelligence Report
+                </button>
               )}
               <button
                 onClick={() => setShowDiff((p) => !p)}
@@ -396,6 +421,19 @@ export function UploadPage() {
                 baselineName={filename ?? "original.json"}
                 onClose={() => setShowDiff(false)}
               />
+            )}
+
+            {/* Full Inline Report Panel */}
+            {showInlineReport && (
+              <div className="mt-8 pt-8 border-t" style={{ borderColor: "var(--color-fi-border)" }}>
+                <InlineReportPanel
+                  result={report.result}
+                  slug={report.slug}
+                  filename={filename}
+                  onAnalyzeAnother={() => { setState("idle"); setReport(null); setShowInlineReport(false); }}
+                  onToggleDiff={() => setShowDiff((p) => !p)}
+                />
+              </div>
             )}
           </div>
         )}

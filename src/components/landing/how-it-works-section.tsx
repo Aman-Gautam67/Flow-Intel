@@ -14,7 +14,7 @@ const STEPS = [
     n: "02",
     icon: Cpu,
     title: "Analyse",
-    detail: "252 rules execute in parallel across 10 categories. Each rule is a pure function: same AST always produces same findings. Zero LLM calls.",
+    detail: "402 rules execute in parallel across 10 categories. Each rule is a pure function: same AST always produces same findings. Zero LLM calls.",
     color: "#00ff88",
   },
   {

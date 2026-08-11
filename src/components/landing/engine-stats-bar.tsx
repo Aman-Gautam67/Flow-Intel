@@ -2,10 +2,10 @@
 
 // Real engine stats — keep in sync with rule-packs/index.ts
 export const ENGINE_STATS = {
-  rules:       252,
+  rules:       402,
   categories:  10,
   gates:        5,
-  platforms:    4,
+  platforms:    6,
   dimensions:   9,
   autoFixes:   48,   // rules that ship autoFix patches
 };

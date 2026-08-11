@@ -272,6 +272,25 @@ export function WorkflowDashboard({
                 {infoCount > 0 && <span style={{ color: "var(--color-fi-info)" }}>{infoCount} INFO</span>}
                 {allFlags.length === 0 && <span style={{ color: "var(--color-fi-accent)" }}>CLEAN</span>}
               </div>
+              <button
+                onClick={() => exportReport("md")}
+                className="flex items-center gap-1.5 px-3 py-2 border font-mono text-[10px] uppercase tracking-widest transition-all hover:border-[rgba(0,255,136,0.4)] hover:text-[var(--color-fi-text)]"
+                style={{ borderColor: "rgba(255,255,255,0.14)", color: "var(--color-fi-muted)", background: "rgba(255,255,255,0.02)" }}>
+                <Download size={11} /> .md
+              </button>
+              <button
+                onClick={() => exportReport("csv")}
+                className="flex items-center gap-1.5 px-3 py-2 border font-mono text-[10px] uppercase tracking-widest transition-all hover:border-[rgba(0,255,136,0.4)] hover:text-[var(--color-fi-text)]"
+                style={{ borderColor: "rgba(255,255,255,0.14)", color: "var(--color-fi-muted)", background: "rgba(255,255,255,0.02)" }}>
+                <Download size={11} /> .csv
+              </button>
+              <PdfExportButton
+                slug={slug}
+                title={title}
+                platform={platform}
+                nodeCount={nodeCount}
+                scores={scores}
+              />
             </div>
           </div>
         </div>
