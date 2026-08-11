@@ -395,7 +395,7 @@ export const COST_OPTIMIZATION_EXT: RulePackManifest = {
       category: "COST_OPTIMIZATION",
       severity: "INFO",
       description: "Workflow uses a mid-tier model where a cheap model would suffice.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 3,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/CST-015",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
@@ -459,7 +459,7 @@ export const COST_OPTIMIZATION_EXT: RulePackManifest = {
       category: "COST_OPTIMIZATION",
       severity: "INFO",
       description: "Workflow uses paid services but has no estimated cost per execution in its metadata.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 2,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/CST-017",
       detect(ast: ParsedWorkflow): Finding[] {
         const PAID = new Set(["n8n-nodes-base.stripe","n8n-nodes-base.openAi","@n8n/n8n-nodes-langchain.openAi","n8n-nodes-base.awsS3"]);
@@ -582,7 +582,7 @@ export const COST_OPTIMIZATION_EXT: RulePackManifest = {
       category: "COST_OPTIMIZATION",
       severity: "INFO",
       description: "Scheduled workflow has not been executed recently — may be obsolete and wasting quota.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 2,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/CST-021",
       detect(ast: ParsedWorkflow): Finding[] {
         const meta = ast.metadata as Record<string,unknown> | undefined;

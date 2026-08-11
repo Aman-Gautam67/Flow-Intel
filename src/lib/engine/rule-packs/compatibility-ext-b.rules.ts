@@ -215,7 +215,7 @@ export const COMPATIBILITY_EXT_B: RulePackManifest = {
       category: "COMPATIBILITY",
       severity: "MEDIUM",
       description: "Stripe API calls use a pinned API version older than 2 years.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/CMP-023",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];

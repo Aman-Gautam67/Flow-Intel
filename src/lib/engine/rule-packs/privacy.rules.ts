@@ -102,7 +102,7 @@ export const PRIVACY_PACK: RulePackManifest = {
       description: "PII field names are referenced before an outbound HTTP node with no masking step.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 15,
+      penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/PRV-002",
       detect(ast: ParsedWorkflow): Finding[] {
         const httpNodes = ast.nodes.filter((n) => n.type === "n8n-nodes-base.httpRequest" && n.isHttp);
@@ -140,7 +140,7 @@ export const PRIVACY_PACK: RulePackManifest = {
       description: "A single credential is reused across 4+ nodes — compromise of that credential affects all.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 12,
+      penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/PRV-003",
       detect(ast: ParsedWorkflow): Finding[] {
         const credUsage = new Map<string, number>();

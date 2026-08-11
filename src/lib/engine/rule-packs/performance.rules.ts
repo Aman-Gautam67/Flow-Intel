@@ -47,7 +47,7 @@ export const PERFORMANCE_PACK: RulePackManifest = {
       description: "Two or more independent HTTP/API calls connected in sequence could be parallelized.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 6,
+      penaltyPoints: 5,
       docReference: "https://flowintel.io/rules/PER-001",
       detect(ast: ParsedWorkflow): Finding[] {
         // Look for two or more HTTP nodes where one directly follows another
@@ -152,7 +152,7 @@ export const PERFORMANCE_PACK: RulePackManifest = {
       description: "GPT-4/Claude Opus level models used for tasks that a cheaper model could handle.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 5,
+      penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/PER-003",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];

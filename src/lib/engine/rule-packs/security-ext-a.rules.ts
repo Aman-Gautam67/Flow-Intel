@@ -176,9 +176,8 @@ export const SECURITY_EXT_A: RulePackManifest = {
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
         for (const node of ast.nodes) {
+          if (!node.isAi) continue;
           const t = node.type.toLowerCase();
-          if (!t.includes("ai") && !t.includes("openai") && !t.includes("anthropic") &&
-              !t.includes("langchain") && !t.includes("llm")) continue;
           const isApproved = [...ALLOWED_AI_PROVIDERS].some((p) => t.includes(p));
           if (!isApproved) {
             findings.push({

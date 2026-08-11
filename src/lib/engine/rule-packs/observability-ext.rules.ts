@@ -399,7 +399,7 @@ export const OBSERVABILITY_EXT: RulePackManifest = {
       category: "OBSERVABILITY",
       severity: "INFO",
       description: "Disabled nodes remain in the workflow without a comment explaining why.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 2,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/OBS-017",
       detect(ast: ParsedWorkflow): Finding[] {
         const disabled = ast.nodes.filter((n) => n.disabled === true);
@@ -478,7 +478,7 @@ export const OBSERVABILITY_EXT: RulePackManifest = {
       category: "OBSERVABILITY",
       severity: "INFO",
       description: "Workflow has no environment or classification tags (prod, staging, dev, critical).",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 2,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/OBS-020",
       detect(ast: ParsedWorkflow): Finding[] {
         const meta = ast.metadata as Record<string,unknown> | undefined;

@@ -83,7 +83,7 @@ export const DOCUMENTATION_PACK: RulePackManifest = {
       description: "Workflow uses $env.VARIABLE_NAME references without documenting required environment variables.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 6,
+      penaltyPoints: 5,
       docReference: "https://flowintel.io/rules/DOC-002",
       detect(ast: ParsedWorkflow): Finding[] {
         const envRefs = countEnvReferences(ast);
@@ -122,7 +122,7 @@ export const DOCUMENTATION_PACK: RulePackManifest = {
       description: "Workflow has no changelog or version history — marketplace users cannot track changes between versions.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 3,
+      penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/DOC-003",
       detect(ast: ParsedWorkflow): Finding[] {
         if (hasChangelog(ast)) return [];

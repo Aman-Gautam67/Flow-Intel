@@ -43,7 +43,7 @@ export const COMPATIBILITY_EXT_A: RulePackManifest = {
       category: "COMPATIBILITY",
       severity: "MEDIUM",
       description: "Node uses a typeVersion older than the current version, missing improvements and fixes.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/CMP-004",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
@@ -417,7 +417,7 @@ export const COMPATIBILITY_EXT_A: RulePackManifest = {
       category: "COMPATIBILITY",
       severity: "MEDIUM",
       description: "Workflow uses $node[] syntax from the legacy expression engine incompatible with new versions.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/CMP-016",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];

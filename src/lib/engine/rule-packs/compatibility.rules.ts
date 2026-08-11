@@ -91,7 +91,7 @@ export const COMPATIBILITY_PACK: RulePackManifest = {
       description: "Workflow depends on community nodes that may not be installed on the target n8n instance.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 12,
+      penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/CMP-002",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
@@ -131,7 +131,7 @@ export const COMPATIBILITY_PACK: RulePackManifest = {
       description: "Workflow has no recorded n8n version — compatibility cannot be verified.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 3,
+      penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/CMP-003",
       detect(ast: ParsedWorkflow): Finding[] {
         const meta = ast.metadata as Record<string, unknown> | undefined;

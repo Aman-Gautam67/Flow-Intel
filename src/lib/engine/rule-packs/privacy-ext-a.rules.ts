@@ -238,7 +238,7 @@ export const PRIVACY_EXT_A: RulePackManifest = {
       category: "PRIVACY",
       severity: "MEDIUM",
       description: "Workflow stores PII but has no delete/erasure path for GDPR right-to-erasure requests.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 15,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/PRV-010",
       detect(ast: ParsedWorkflow): Finding[] {
         const DB = new Set(["n8n-nodes-base.postgres","n8n-nodes-base.mysql","n8n-nodes-base.mongodb"]);
@@ -303,7 +303,7 @@ export const PRIVACY_EXT_A: RulePackManifest = {
       category: "PRIVACY",
       severity: "MEDIUM",
       description: "Workflow collects more PII fields than it uses downstream.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/PRV-012",
       detect(ast: ParsedWorkflow): Finding[] {
         const trigger = ast.nodes.find((n) => n.isTrigger);

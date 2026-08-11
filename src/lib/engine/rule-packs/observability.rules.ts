@@ -56,7 +56,7 @@ export const OBSERVABILITY_PACK: RulePackManifest = {
       description: "Workflow contains no execution ID capture or timestamping for audit purposes.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 8,
+      penaltyPoints: 5,
       docReference: "https://flowintel.io/rules/OBS-001",
       detect(ast: ParsedWorkflow): Finding[] {
         // Only flag workflows with more than 3 nodes to avoid noise on simple automations
@@ -126,7 +126,7 @@ export const OBSERVABILITY_PACK: RulePackManifest = {
       description: "Workflow has no description metadata, making it hard to understand without reading every node.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 3,
+      penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/OBS-003",
       detect(ast: ParsedWorkflow): Finding[] {
         const meta = ast.metadata;

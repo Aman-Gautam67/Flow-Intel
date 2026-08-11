@@ -15,9 +15,9 @@ export const DOCUMENTATION_EXT: RulePackManifest = {
       id: "DOC-004",
       name: "Missing Required Credentials List",
       category: "DOCUMENTATION",
-      severity: "HIGH",
+      severity: "MEDIUM",
       description: "Workflow uses credentials but does not document which credentials are required to run it.",
-      enabled: true, marketplaceBlocking: true, penaltyPoints: 15,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/DOC-004",
       detect(ast: ParsedWorkflow): Finding[] {
         const credTypes = new Set<string>();
@@ -46,9 +46,9 @@ export const DOCUMENTATION_EXT: RulePackManifest = {
       id: "DOC-005",
       name: "Missing Environment Variable Documentation",
       category: "DOCUMENTATION",
-      severity: "HIGH",
+      severity: "MEDIUM",
       description: "Workflow uses $env variables but does not document what values are required.",
-      enabled: true, marketplaceBlocking: true, penaltyPoints: 15,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/DOC-005",
       detect(ast: ParsedWorkflow): Finding[] {
         const envVars = new Set<string>();
@@ -260,9 +260,9 @@ export const DOCUMENTATION_EXT: RulePackManifest = {
       id: "DOC-013",
       name: "Missing Dependencies / Community Nodes List",
       category: "DOCUMENTATION",
-      severity: "HIGH",
+      severity: "MEDIUM",
       description: "Workflow uses community nodes but doesn't list them as required dependencies.",
-      enabled: true, marketplaceBlocking: true, penaltyPoints: 15,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/DOC-013",
       detect(ast: ParsedWorkflow): Finding[] {
         if (ast.platform !== "N8N") return []; // Community nodes logic currently only applies to n8n

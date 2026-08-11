@@ -56,7 +56,7 @@ export const MAINTAINABILITY_PACK: RulePackManifest = {
       description: "Nodes with no incoming or outgoing connections are dead weight — they never execute.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 6,
+      penaltyPoints: 5,
       docReference: "https://flowintel.io/rules/MNT-001",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];

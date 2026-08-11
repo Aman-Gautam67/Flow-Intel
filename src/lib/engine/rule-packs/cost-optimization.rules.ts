@@ -114,7 +114,7 @@ export const COST_OPTIMIZATION_PACK: RulePackManifest = {
       description: "Same HTTP endpoint is called multiple times in the same workflow execution.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 6,
+      penaltyPoints: 5,
       docReference: "https://flowintel.io/rules/CST-002",
       detect(ast: ParsedWorkflow): Finding[] {
         const httpNodes = ast.nodes.filter((n) => n.type === "n8n-nodes-base.httpRequest");
@@ -159,7 +159,7 @@ export const COST_OPTIMIZATION_PACK: RulePackManifest = {
       description: "Read-only API calls inside a loop could be cached outside the loop to save API quota.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 4,
+      penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/CST-003",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
