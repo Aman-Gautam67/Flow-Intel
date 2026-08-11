@@ -1,7 +1,7 @@
-// ─── Platform ───────────────────────────────────────────────────────────────
 export type Platform =
   | "N8N" | "MAKE" | "ZAPIER" | "FLOWISE" | "LANGFLOW"
-  | "AIRFLOW" | "PREFECT" | "DAGSTER" | "GENERIC";
+  | "AIRFLOW" | "PREFECT" | "DAGSTER" | "GENERIC"
+  | "NODE_RED" | "ACTIVEPIECES";
 
 // ─── Severity ────────────────────────────────────────────────────────────────
 export type Severity = "CRITICAL" | "WARNING" | "INFO" | "PASS";

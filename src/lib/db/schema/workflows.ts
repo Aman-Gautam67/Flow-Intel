@@ -17,6 +17,7 @@ import { users } from "./users";
 // ─── Enums ────────────────────────────────────────────────────────────────────
 export const platformEnum = pgEnum("platform", [
   "N8N", "MAKE", "ZAPIER", "FLOWISE", "LANGFLOW",
+  "AIRFLOW", "PREFECT", "DAGSTER", "GENERIC",
   "NODE_RED", "ACTIVEPIECES",
 ]);
 

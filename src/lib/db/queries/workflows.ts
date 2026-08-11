@@ -13,7 +13,7 @@ import {
   tags,
   categories,
 } from "@/lib/db/schema";
-import type { AuditFlag, ScoreBreakdown, SearchParams } from "@/types";
+import type { AuditFlag, ScoreBreakdown, SearchParams, Platform } from "@/types";
 import type { AnalysisReport, Certificate, CategoryScore } from "@/lib/engine/types";
 import { nanoid } from "nanoid";
 
@@ -33,7 +33,7 @@ function makeUniqueSlug(name: string): string {
 export async function createWorkflowWithAnalysis(params: {
   title: string;
   description?: string;
-  platform?: "N8N" | "MAKE" | "ZAPIER" | "FLOWISE" | "LANGFLOW";
+  platform?: Platform;
   isPublic?: boolean;
   authorId?: string;
   rawJson: unknown;
