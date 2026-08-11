@@ -131,7 +131,7 @@ export function adaptToLegacyScoreBreakdown(report: AnalysisReport): ScoreBreakd
   });
   const hasAiNodes = report.ast.aiNodesCount > 0;
   const aiGuardrailsScore = hasAiNodes
-    ? Math.max(0, 100 - aiFindings.reduce((s, f) => s + f.penaltyPoints, 0))
+    ? Math.max(0, 100 - aiFindings.reduce((s, f) => s + (f.penaltyPoints ?? 0), 0))
     : null;
 
   // Hygiene = MAINTAINABILITY

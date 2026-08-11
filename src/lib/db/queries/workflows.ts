@@ -86,13 +86,13 @@ export async function createWorkflowWithAnalysis(params: {
       privacyScore: s.privacyScore ?? 100,
       aiGuardrailsScore: s.aiGuardrailsScore ?? null,
       estimatedCostUsd: s.estimatedCostUsd ?? 0,
-      securityFlags: s.securityFlags as unknown as Record<string, unknown>[],
-      resilienceFlags: s.resilienceFlags as unknown as Record<string, unknown>[],
-      memoryProfile: s.memoryProfile as unknown as Record<string, unknown>,
-      debtProfile: s.debtProfile as unknown as Record<string, unknown>,
-      privacyProfile: s.privacyProfile as unknown as Record<string, unknown>,
-      remediationSteps: s.remediationSteps as unknown as Record<string, unknown>[],
-      allFlags: s.flags as unknown as Record<string, unknown>[],
+      securityFlags: (s.securityFlags ?? []) as unknown as Record<string, unknown>[],
+      resilienceFlags: (s.resilienceFlags ?? []) as unknown as Record<string, unknown>[],
+      memoryProfile: (s.memoryProfile ?? {}) as unknown as Record<string, unknown>,
+      debtProfile: (s.debtProfile ?? {}) as unknown as Record<string, unknown>,
+      privacyProfile: (s.privacyProfile ?? {}) as unknown as Record<string, unknown>,
+      remediationSteps: (s.remediationSteps ?? []) as unknown as Record<string, unknown>[],
+      allFlags: (s.flags ?? []) as unknown as Record<string, unknown>[],
     });
 
     // Dependencies

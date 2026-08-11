@@ -1,0 +1,1 @@
+import { db } from "./src/lib/db/client"; import { sql } from "drizzle-orm"; async function fix() { await db.execute(sql`ALTER TABLE "workflow_scores" ALTER COLUMN "ai_guardrails_score" DROP NOT NULL;`); console.log("Fixed!"); process.exit(0); } fix();
