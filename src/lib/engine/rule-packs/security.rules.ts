@@ -235,6 +235,7 @@ export const SECURITY_PACK: RulePackManifest = {
         const findings: Finding[] = [];
         const DANGEROUS: Array<{ re: RegExp; label: string }> = [
           { re: /\beval\s*\(/, label: "eval()" },
+          { re: /\bnew\s+Function\s*\(/, label: "new Function()" },
           { re: /require\s*\(\s*['"]child_process['"]/, label: "child_process" },
           { re: /\bexecSync\s*\(|\bspawnSync\s*\(|\bexec\s*\(/, label: "shell execution" },
           { re: /require\s*\(\s*['"]fs['"]/, label: "fs module" },

@@ -50,32 +50,38 @@ function buildInbound(ast: ParsedWorkflow): Map<string, number> {
 /**
  * BFS from every non-disabled trigger.
  * Disabled nodes may be visited but are never expanded (they wall the path).
+ *
+ * Different parsers use different keys in edges:
+ *   n8n      → edge source/target = node.name   ("Webhook", "HTTP Request")
+ *   Make     → edge source/target = node.id      ("1", "2")
+ *   Zapier   → edge source/target = node.id      ("step-1", "step-2")
+ *   Flowise  → edge source/target = node.id      ("chat-input", "llm-chain")
+ *
+ * To be key-convention-agnostic we seed from BOTH node.id AND node.name so
+ * the BFS always finds neighbors regardless of which convention the parser used.
  */
 function reachableFromTriggers(ast: ParsedWorkflow, adj: Map<string, string[]>): Set<string> {
-  const disabled = new Set(ast.nodes.filter((n) => n.disabled).map((n) => n.name));
-  const starts = ast.nodes
-    .filter((n) => isTrigger(n) && !disabled.has(n.name))
-    .map((n) => n.name);
+  const disabledNames = new Set(ast.nodes.filter((n) => n.disabled).map((n) => n.name));
+  const disabledIds   = new Set(ast.nodes.filter((n) => n.disabled).map((n) => n.id));
 
   const visited = new Set<string>();
   const queue: string[] = [];
   let head = 0;
 
-  for (const name of starts) {
-    if (!visited.has(name)) {
-      visited.add(name);
-      queue.push(name);
+  for (const node of ast.nodes) {
+    if (!isTrigger(node) || disabledNames.has(node.name) || disabledIds.has(node.id)) continue;
+    // Seed from both id and name — one will match the edge convention used by the parser
+    for (const key of [node.id, node.name]) {
+      if (!visited.has(key)) { visited.add(key); queue.push(key); }
     }
   }
 
   while (head < queue.length) {
-    const current = queue[head++];
-    if (disabled.has(current)) continue;
+    const current = queue[head++]!;
+    if (disabledNames.has(current) || disabledIds.has(current)) continue;
 
     for (const neighbor of adj.get(current) ?? []) {
-      if (visited.has(neighbor)) continue;
-      visited.add(neighbor);
-      queue.push(neighbor);
+      if (!visited.has(neighbor)) { visited.add(neighbor); queue.push(neighbor); }
     }
   }
 
@@ -121,7 +127,8 @@ export const CONTROL_FLOW_PACK: RulePackManifest = {
 
         for (const node of ast.nodes) {
           if (node.disabled || isTrigger(node)) continue;
-          if (reachable.has(node.name)) continue;
+          // Check both id and name — parsers use different edge key conventions
+          if (reachable.has(node.id) || reachable.has(node.name)) continue;
 
           findings.push({
             id: makeFindingId("ARCH-CF-001", node.id),

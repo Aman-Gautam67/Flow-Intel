@@ -1,0 +1,49 @@
+{
+  "name": "[QA] PII in console.log inside Code node (v2)",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "prv001-node-1",
+      "name": "Log Debug 1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "jsCode": "console.log('SSN:', items[0].json.ssn, 'DOB:', items[0].json.dob)\nreturn items;"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log Debug 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

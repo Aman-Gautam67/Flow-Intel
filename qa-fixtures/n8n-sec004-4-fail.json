@@ -1,0 +1,49 @@
+{
+  "name": "[QA] eval() / child_process in Code node (v4)",
+  "nodes": [
+    {
+      "id": "trigger-3",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sec004-node-3",
+      "name": "Dynamic Exec 3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        400
+      ],
+      "parameters": {
+        "jsCode": "eval(items[0].json.code)\nreturn items;"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Dynamic Exec 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

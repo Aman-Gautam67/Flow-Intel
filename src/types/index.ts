@@ -1,5 +1,7 @@
 // ─── Platform ───────────────────────────────────────────────────────────────
-export type Platform = "N8N" | "MAKE" | "ZAPIER" | "FLOWISE" | "LANGFLOW";
+export type Platform =
+  | "N8N" | "MAKE" | "ZAPIER" | "FLOWISE" | "LANGFLOW"
+  | "AIRFLOW" | "PREFECT" | "DAGSTER" | "GENERIC";
 
 // ─── Severity ────────────────────────────────────────────────────────────────
 export type Severity = "CRITICAL" | "WARNING" | "INFO" | "PASS";
@@ -67,7 +69,7 @@ export interface ParsedWorkflow {
   branchCount: number;
   loopCount: number;
   extractedSecretsCount: number;
-  rawNodes: N8nNode[];
+  rawNodes: unknown[];   // platform-raw node array; N8nNode[] for N8N, unknown[] for others
   rawConnections: Record<string, unknown>;
 }
 
@@ -100,6 +102,7 @@ export interface AuditFlag {
   id: string;
   rule: string;
   severity: Severity;
+  /** Legacy 6-bucket category — used for score ring grouping and DB column compat */
   category:
     | "ARCHITECTURE"
     | "SECURITY"
@@ -107,6 +110,12 @@ export interface AuditFlag {
     | "MEMORY"
     | "AI_GUARDRAILS"
     | "HYGIENE";
+  /**
+   * Real v2 category name — more specific than the legacy 6-bucket `category`.
+   * Populated by adapter-bridge.ts so the UI can show the precise dimension
+   * (e.g. "COMPATIBILITY" or "OBSERVABILITY") instead of the collapsed "HYGIENE" label.
+   */
+  v2Category?: string;
   title: string;
   detail: string;
   nodeName?: string;

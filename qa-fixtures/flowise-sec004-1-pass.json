@@ -1,0 +1,49 @@
+{
+  "name": "[QA] eval() / child_process in Code node (v1)",
+  "nodes": [
+    {
+      "id": "trigger-0",
+      "position": {
+        "x": 200,
+        "y": 300
+      },
+      "type": "chatInput",
+      "data": {
+        "id": "trigger-0",
+        "label": "Chat Input",
+        "name": "chatInput",
+        "type": "Chain"
+      }
+    },
+    {
+      "id": "flowintel-injected-error-trigger",
+      "name": "Error Trigger [Auto-Injected]",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "parameters": {
+        "notes": "Auto-injected by FlowIntel remediation engine. Wire to your preferred alert channel."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-0",
+      "source": "trigger-0",
+      "target": "sec004-node-0",
+      "type": "buttonedge"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notify On Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "name": "[QA] SQL injection via string concatenation (v4)",
+  "nodes": [
+    {
+      "id": "trigger-3",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sec008-node-3",
+      "name": "Query DB 3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        400
+      ],
+      "parameters": {
+        "jsCode": "// ⚠️  [FlowIntel AUTO-FIX REQUIRED] SQL injection risk detected.\n// Replace string concatenation with parameterised queries:\n// BAD:  const q = \"SELECT ... WHERE id='\" + id + \"'\";\n// GOOD: const result = await pool.query('SELECT ... WHERE id=$1', [id]);\nconst userId = items[0].json.userId;\nconst query = \"SELECT * FROM users WHERE id='\" + userId + \"'\";\nreturn [{json: {query}}];"
+      }
+    },
+    {
+      "id": "flowintel-injected-error-trigger",
+      "name": "Error Trigger [Auto-Injected]",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "parameters": {
+        "notes": "Auto-injected by FlowIntel remediation engine. Wire to your preferred alert channel."
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Query DB 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notify On Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

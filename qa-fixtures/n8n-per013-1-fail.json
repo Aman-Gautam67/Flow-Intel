@@ -1,0 +1,49 @@
+{
+  "name": "[QA] Verbose debug logging enabled (v1)",
+  "nodes": [
+    {
+      "id": "trigger-0",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "per013-node-0",
+      "name": "Process 0",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "jsCode": "console.log('User email:', items[0].json.email)\nreturn items;"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Process 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

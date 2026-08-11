@@ -1,0 +1,97 @@
+{
+  "name": "[QA] N+1 HTTP call inside a loop (v4)",
+  "nodes": [
+    {
+      "id": "trigger-3",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "per001-loop-3",
+      "name": "Batch Loop 3",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        560,
+        300
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "per001-loop-3-http-child",
+      "name": "Fetch Record 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        760,
+        300
+      ],
+      "parameters": {
+        "url": "https://api.example.com/record/{{$json.id}}",
+        "method": "GET"
+      },
+      "continueOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "flowintel-injected-error-trigger",
+      "name": "Error Trigger [Auto-Injected]",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "parameters": {
+        "notes": "Auto-injected by FlowIntel remediation engine. Wire to your preferred alert channel."
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Batch Loop 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Batch Loop 3": {
+      "main": [
+        [
+          {
+            "node": "Fetch Record 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notify On Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

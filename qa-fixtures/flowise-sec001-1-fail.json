@@ -1,0 +1,42 @@
+{
+  "name": "[QA] Hardcoded API key in Code node (v1)",
+  "nodes": [
+    {
+      "id": "trigger-0",
+      "position": {
+        "x": 200,
+        "y": 300
+      },
+      "type": "chatInput",
+      "data": {
+        "id": "trigger-0",
+        "label": "Chat Input",
+        "name": "chatInput",
+        "type": "Chain"
+      }
+    },
+    {
+      "id": "sec001-node-0",
+      "position": {
+        "x": 450,
+        "y": 300
+      },
+      "type": "code",
+      "data": {
+        "id": "sec001-node-0",
+        "label": "Code 0",
+        "name": "code",
+        "type": "Chain",
+        "code": "const apiKey = 'sk_live_ABCDEF123456';\nreturn items;"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-0",
+      "source": "trigger-0",
+      "target": "sec001-node-0",
+      "type": "buttonedge"
+    }
+  ]
+}

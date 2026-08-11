@@ -414,7 +414,8 @@ export const COMPATIBILITY_EXT_B: RulePackManifest = {
             location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
             evidence: { summary: "Execute Command node present", detail: `"${node.name}" uses Execute Command which is blocked on n8n Cloud for security reasons.` },
             humanExplanation: "n8n Cloud blocks the Execute Command node. Workflows using it will fail for all Cloud users.",
-            suggestedFix: "Replace Execute Command with a dedicated node (HTTP Request, Code, or a native service node) or document that self-hosted n8n is required.",
+            suggestedFix: "For Cloud compatibility: replace Execute Command with HTTP Request, Code node, or a native service integration. " +
+              "If this workflow is intentionally self-hosted-only, add `selfHostedOnly: true` to workflow metadata and document Cloud incompatibility clearly for marketplace users.",
             marketplaceBlocking: true, docReference: "https://flowintel.io/rules/CMP-029", penaltyPoints: 25,
           }));
       },

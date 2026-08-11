@@ -1,0 +1,42 @@
+{
+  "name": "[QA] eval() / child_process in Code node (v1)",
+  "nodes": [
+    {
+      "id": "trigger-0",
+      "position": {
+        "x": 200,
+        "y": 300
+      },
+      "type": "chatInput",
+      "data": {
+        "id": "trigger-0",
+        "label": "Chat Input",
+        "name": "chatInput",
+        "type": "Chain"
+      }
+    },
+    {
+      "id": "sec004-node-0",
+      "position": {
+        "x": 450,
+        "y": 300
+      },
+      "type": "code",
+      "data": {
+        "id": "sec004-node-0",
+        "label": "Exec 0",
+        "name": "code",
+        "type": "Chain",
+        "code": "eval(items[0].json.code)\nreturn items;"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-0",
+      "source": "trigger-0",
+      "target": "sec004-node-0",
+      "type": "buttonedge"
+    }
+  ]
+}

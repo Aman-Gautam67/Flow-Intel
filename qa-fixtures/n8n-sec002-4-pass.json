@@ -1,0 +1,72 @@
+{
+  "name": "[QA] Unauthenticated webhook trigger (v4)",
+  "nodes": [
+    {
+      "id": "trigger-3",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sec002-node-3",
+      "name": "Webhook 3",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        480
+      ],
+      "parameters": {
+        "path": "public-endpoint-3",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "flowintel-injected-error-trigger",
+      "name": "Error Trigger [Auto-Injected]",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "parameters": {
+        "notes": "Auto-injected by FlowIntel remediation engine. Wire to your preferred alert channel."
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Webhook 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notify On Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

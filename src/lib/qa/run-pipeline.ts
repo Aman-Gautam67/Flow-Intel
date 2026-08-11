@@ -146,7 +146,7 @@ function runPhase4Verification(fixturesDir: string): {
 function main(): void {
   const start = Date.now();
   const dir = path.resolve(OUT_DIR);
-  const scriptDir = path.dirname(new URL(import.meta.url).pathname);
+  const scriptDir = path.join(process.cwd(), "src/lib/qa");
 
   console.log(`\n${C.bold}╔══════════════════════════════════════════════════════════╗${C.reset}`);
   console.log(`${C.bold}║     FlowIntel QA Pipeline — Full End-to-End Run          ║${C.reset}`);
@@ -201,6 +201,13 @@ function main(): void {
     console.log(`  Avg pass FQI       : ${C.bold}${v.avgFqiPass}${C.reset}`);
     results.push({ phase: 4, ok: allImproved, notes: `${v.improved}/${v.total} FQI improved` });
   }
+
+  // ── Phase 5: False-Positive Guard (negative fixtures) ─────────────────
+  banner(5, "False-Positive Guard (Negative Fixtures)");
+  const fp = runScript(path.join(scriptDir, "audit-negative-fixtures.ts"), []);
+  process.stdout.write(fp.output);
+  const fpOk = fp.exitCode === 0;
+  results.push({ phase: 5, ok: fpOk, notes: fpOk ? "no false positives" : "FALSE POSITIVES — rule engine regression" });
 
   // ── Final summary ──────────────────────────────────────────────────────
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);

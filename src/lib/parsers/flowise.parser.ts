@@ -138,7 +138,9 @@ function flowNodeToNormal(node: FlowNode): NormalNode {
   const isBranch = nodeType.toLowerCase().includes("router") || nodeType.toLowerCase().includes("branch");
   const isLoop = nodeType.toLowerCase().includes("loop") || nodeType.toLowerCase().includes("iterate");
   const isDelay = nodeType.toLowerCase().includes("delay") || nodeType.toLowerCase().includes("wait");
-  const isTrigger = FLOWISE_TRIGGER_TYPES.has(nodeType) || nodeType.toLowerCase().includes("trigger") || nodeType.toLowerCase().includes("start");
+  const isTrigger = FLOWISE_TRIGGER_TYPES.has(nodeType) || nodeType.toLowerCase().includes("trigger") || nodeType.toLowerCase().includes("start") ||
+    // Flowise "Source" category nodes and chatInput are DAG entry points, not downstream consumers
+    (node.data?.type === "Source") || nodeType === "chatInput";
   const isAgent = FLOWISE_AGENT_TYPES.has(nodeType);
 
   const httpMeta = isHttp ? {

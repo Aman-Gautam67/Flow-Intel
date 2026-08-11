@@ -1,0 +1,48 @@
+{
+  "name": "[QA] HTTP node with no error handling branch (v1)",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "port": 443,
+        "method": "POST"
+      },
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "module": "http:ActionSendData",
+      "version": 1,
+      "parameters": {
+        "url": "https://api.example.com/records",
+        "method": "GET"
+      },
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 100
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true
+    },
+    "designer": {
+      "orphans": []
+    }
+  }
+}

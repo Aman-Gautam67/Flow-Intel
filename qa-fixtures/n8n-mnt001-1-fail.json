@@ -1,0 +1,56 @@
+{
+  "name": "[QA] Dead-end / orphan node (no outgoing connection) (v1)",
+  "nodes": [
+    {
+      "id": "trigger-0",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "mnt001-node-0",
+      "name": "Dead Node 0",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        900,
+        600
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "unused",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Dead Node 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

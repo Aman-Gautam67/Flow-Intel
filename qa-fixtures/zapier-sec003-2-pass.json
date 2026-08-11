@@ -1,0 +1,25 @@
+{
+  "title": "[QA] HTTP (not HTTPS) egress to external host (v2)",
+  "status": "off",
+  "steps": [
+    {
+      "id": "trigger-1",
+      "type_of": "read",
+      "app_name": "webhook",
+      "params": {
+        "url": "https://hooks.zapier.com/hooks/catch/test"
+      },
+      "selected_api": "webhook_v1"
+    },
+    {
+      "id": "sec003-step-1",
+      "type_of": "write",
+      "app_name": "webhooks",
+      "params": {
+        "url": "http://internal-service/process",
+        "method": "GET"
+      },
+      "selected_api": "webhooks_v1"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "name": "[QA] Hardcoded API key in Code node (v4)",
+  "nodes": [
+    {
+      "id": "trigger-3",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sec001-node-3",
+      "name": "Process Data 3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const apiKey = '{{ $env.SECRET_PROCESS_DATA_3 }}';\nconst result = items.map(i => ({...i.json, key: apiKey}));\nreturn result.map(r => ({json: r}));"
+      }
+    },
+    {
+      "id": "flowintel-injected-error-trigger",
+      "name": "Error Trigger [Auto-Injected]",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "parameters": {
+        "notes": "Auto-injected by FlowIntel remediation engine. Wire to your preferred alert channel."
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Process Data 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notify On Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

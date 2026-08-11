@@ -1,0 +1,49 @@
+{
+  "name": "[QA] SQL injection via string concatenation (v2)",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sec008-node-1",
+      "name": "Query DB 1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const userId = items[0].json.userId;\nconst query = `SELECT * FROM orders WHERE email='${email}'`;\nreturn [{json: {query}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Query DB 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

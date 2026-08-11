@@ -126,8 +126,27 @@ export const PRIVACY_EXT_B: RulePackManifest = {
       enabled: true, marketplaceBlocking: true, penaltyPoints: 35,
       docReference: "https://flowintel.io/rules/PRV-017",
       detect(ast: ParsedWorkflow): Finding[] {
-        const s = ast.nodes.map((n) => ps(n)).join(" ").toLowerCase();
-        if (!/age|dateofbirth|dob|minor|child|under.*13|under.*16/i.test(s)) return [];
+        const FIELD_NAMES = [
+          "age", "dob", "dateOfBirth", "date_of_birth", "minor", "children",
+          "childAge", "child_age", "userAge", "user_age", "patientAge", "patient_age",
+          "isMinor", "is_minor", "parentalConsent", "parental_consent", "under13", "under16"
+        ];
+
+        let keyHit = false;
+        for (const param of ast.extractedParameters) {
+          const segments = param.key.split('.');
+          const lastSegment = segments[segments.length - 1];
+          if (FIELD_NAMES.some((f) => f.toLowerCase() === lastSegment.toLowerCase())) {
+            keyHit = true;
+            break;
+          }
+        }
+
+        const allParams = JSON.stringify(ast.nodes.map((n) => n.parameters)).toLowerCase();
+        const blobHit = FIELD_NAMES.some((f) => allParams.includes(`"${f.toLowerCase()}"`));
+
+        if (!keyHit && !blobHit) return [];
+
         const hasAgeVerification = ast.nodes.some((n) => {
           const ns = ps(n);
           return /ageVerification|verifyAge|isAdult|age.*>=.*18|age.*>=.*13/i.test(ns);

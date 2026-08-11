@@ -1,0 +1,42 @@
+{
+  "name": "[QA] PII in console.log inside Code node (v2)",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "position": {
+        "x": 200,
+        "y": 300
+      },
+      "type": "chatInput",
+      "data": {
+        "id": "trigger-1",
+        "label": "Chat Input",
+        "name": "chatInput",
+        "type": "Chain"
+      }
+    },
+    {
+      "id": "prv001-node-1",
+      "position": {
+        "x": 450,
+        "y": 300
+      },
+      "type": "code",
+      "data": {
+        "id": "prv001-node-1",
+        "label": "Log 1",
+        "name": "code",
+        "type": "Chain",
+        "code": "console.log('SSN:', items[0].json.ssn, 'DOB:', items[0].json.dob)\nreturn items;"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-0",
+      "source": "trigger-1",
+      "target": "prv001-node-1",
+      "type": "buttonedge"
+    }
+  ]
+}

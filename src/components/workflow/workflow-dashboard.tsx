@@ -235,23 +235,7 @@ export function WorkflowDashboard({
         <div className="w-48" />
       </nav>
 
-      {/* Stale AI Guardrails banner — shown when AI nodes exist but score is 100 (pre-engine-fix record) */}
-      {deps.some((d) => d.isAi) && (scores as unknown as Record<string,number>).aiGuardrailsScore === 100 && (
-        <div className="border-b" style={{ borderColor: "rgba(247,215,116,0.5)", background: "rgba(247,215,116,0.1)" }}>
-          <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-3">
-              <AlertTriangle size={14} style={{ color: "var(--color-fi-warn)", flexShrink: 0 }} />
-              <span className="font-mono text-[11px]" style={{ color: "rgba(247,215,116,0.95)" }}>
-                <strong>AI Guard score not computed.</strong> This workflow was saved before the AI Guardrails engine was active — the ring shows N/A until you re-analyze.
-              </span>
-            </div>
-            <a href="/upload" className="font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 border shrink-0"
-              style={{ borderColor: "rgba(247,215,116,0.5)", color: "var(--color-fi-warn)", background: "rgba(247,215,116,0.12)" }}>
-              Re-analyze ↗
-            </a>
-          </div>
-        </div>
-      )}
+
 
       {/* Header */}
       <div className="border-b" style={{ borderColor: "var(--color-fi-border)" }}>
@@ -303,22 +287,10 @@ export function WorkflowDashboard({
             const hasAiNodes = deps.some((d) => d.isAi);
             const isAiGuardDim = key === "aiGuardrailsScore";
 
-            // Stale: AI workflow saved before the AI Guardrails engine existed.
-            // DB column is NOT NULL DEFAULT 100, so pre-fix records read back as 100.
-            // We cannot distinguish a genuine perfect-100 from a stale 100 via the
-            // number alone — so treat any 100 on an AI workflow as suspect.
-            const isAiGuardStale = isAiGuardDim && hasAiNodes && rawVal === 100;
-
             let dimScore: number | null = rawVal === undefined ? 0 : rawVal;
 
-            // No AI nodes → N/A ring
-            if (isAiGuardDim && !hasAiNodes) {
-              dimScore = null;
-            }
-
-            // Stale score → render as N/A ring (dashed), not a fake green 100/A+
-            // The "⚠ stale" badge + top banner tell the user why.
-            if (isAiGuardStale) {
+            // AI guardrails: null from DB = not applicable
+            if (isAiGuardDim && rawVal === null) {
               dimScore = null;
             }
 
@@ -343,16 +315,6 @@ export function WorkflowDashboard({
                     <DimensionPopover meta={dimMeta} score={dimScore ?? 0} />
                   )}
                 </div>
-                {/* Stale-data badge: AI nodes present, score not yet computed by AI Guardrails engine */}
-                {isAiGuardStale && (
-                  <span
-                    title="Re-upload workflow JSON to compute an accurate AI Guardrails score."
-                    className="font-mono text-[8px] uppercase tracking-widest cursor-help px-1.5 py-0.5 border"
-                    style={{ color: "var(--color-fi-warn)", borderColor: "rgba(247,215,116,0.4)", background: "rgba(247,215,116,0.08)", lineHeight: 1.4 }}
-                  >
-                    ⚠ re-analyze
-                  </span>
-                )}
               </div>
             );
           })}

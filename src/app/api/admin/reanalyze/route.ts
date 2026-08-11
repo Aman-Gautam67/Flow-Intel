@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
             memoryScore:       s.memoryScore,
             resilienceScore:   s.resilienceScore,
             privacyScore:      s.privacyScore,
-            aiGuardrailsScore: s.aiGuardrailsScore ?? 100,
+            aiGuardrailsScore: s.aiGuardrailsScore,
             estimatedCostUsd:  s.estimatedCostUsd,
             allFlags:          s.flags as unknown as Record<string, unknown>[],
             securityFlags:     s.securityFlags as unknown as Record<string, unknown>[],

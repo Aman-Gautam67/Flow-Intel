@@ -84,7 +84,7 @@ export async function createWorkflowWithAnalysis(params: {
       memoryScore: s.memoryScore,
       resilienceScore: s.resilienceScore,
       privacyScore: s.privacyScore,
-      aiGuardrailsScore: s.aiGuardrailsScore ?? 100,
+      aiGuardrailsScore: s.aiGuardrailsScore,
       estimatedCostUsd: s.estimatedCostUsd,
       securityFlags: s.securityFlags as unknown as Record<string, unknown>[],
       resilienceFlags: s.resilienceFlags as unknown as Record<string, unknown>[],

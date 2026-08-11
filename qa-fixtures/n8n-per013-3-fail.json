@@ -1,0 +1,49 @@
+{
+  "name": "[QA] Verbose debug logging enabled (v3)",
+  "nodes": [
+    {
+      "id": "trigger-2",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "per013-node-2",
+      "name": "Process 2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        300
+      ],
+      "parameters": {
+        "jsCode": "console.log('Password:', items[0].json.password)\nreturn items;"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Process 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "[QA] Hardcoded Bearer token in HTTP header (v1)",
+  "status": "off",
+  "steps": [
+    {
+      "id": "trigger-0",
+      "type_of": "read",
+      "app_name": "webhook",
+      "params": {
+        "url": "https://hooks.zapier.com/hooks/catch/test"
+      },
+      "selected_api": "webhook_v1"
+    },
+    {
+      "id": "sec001b-step-0",
+      "type_of": "write",
+      "app_name": "code",
+      "params": {
+        "code": "const headers = { Authorization: 'Bearer sk_live_ABCDEF123456' };\nreturn {headers};"
+      },
+      "selected_api": "code_v1"
+    }
+  ]
+}

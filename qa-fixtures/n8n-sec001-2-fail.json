@@ -1,0 +1,49 @@
+{
+  "name": "[QA] Hardcoded API key in Code node (v2)",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sec001-node-1",
+      "name": "Process Data 1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const apiKey = 'sk_test_XYZ987654321';\nconst result = items.map(i => ({...i.json, key: apiKey}));\nreturn result.map(r => ({json: r}));"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Process Data 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

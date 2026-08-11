@@ -1,0 +1,52 @@
+{
+  "name": "[QA] Unauthenticated webhook trigger (v3)",
+  "nodes": [
+    {
+      "id": "trigger-2",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sec002-node-2",
+      "name": "Webhook 2",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        420
+      ],
+      "parameters": {
+        "path": "public-endpoint-2",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "authentication": "none"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Webhook 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

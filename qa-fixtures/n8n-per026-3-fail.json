@@ -1,0 +1,49 @@
+{
+  "name": "[QA] O(n²) nested loop in Code node (v3)",
+  "nodes": [
+    {
+      "id": "trigger-2",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "per026-node-2",
+      "name": "Deduplicate 2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const itemsIn = items;\nfor(let i=0;i<itemsIn.length;i++){\n  for(let j=0;j<itemsIn.length;j++){\n    if(itemsIn[i].json.id === itemsIn[j].json.id && i!==j){\n      itemsIn[i].json.duplicate=true;\n    }\n  }\n}\nreturn itemsIn;"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

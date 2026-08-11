@@ -265,6 +265,7 @@ export const DOCUMENTATION_EXT: RulePackManifest = {
       enabled: true, marketplaceBlocking: true, penaltyPoints: 15,
       docReference: "https://flowintel.io/rules/DOC-013",
       detect(ast: ParsedWorkflow): Finding[] {
+        if (ast.platform !== "n8n") return []; // Community nodes logic currently only applies to n8n
         const communityNodes = ast.nodes
           .filter((n) => !n.type.startsWith("n8n-nodes-base.") && !n.type.startsWith("@n8n/"))
           .map((n) => n.type);

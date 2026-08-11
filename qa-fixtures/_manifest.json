@@ -1,0 +1,1262 @@
+[
+  {
+    "file": "n8n-sec001-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "flowise-sec001-1-fail.json",
+    "platform": "flowise",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "flowise-sec001-2-fail.json",
+    "platform": "flowise",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001b-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec001b-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec001b-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec001b-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "zapier-sec001b-1-fail.json",
+    "platform": "zapier",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "zapier-sec001b-2-fail.json",
+    "platform": "zapier",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec002-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec002-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec002-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec002-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec003-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec003-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec003-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec003-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "make-sec003-1-fail.json",
+    "platform": "make",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "make-sec003-2-fail.json",
+    "platform": "make",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "zapier-sec003-1-fail.json",
+    "platform": "zapier",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "zapier-sec003-2-fail.json",
+    "platform": "zapier",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec004-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec004-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec004-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec004-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "flowise-sec004-1-fail.json",
+    "platform": "flowise",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "flowise-sec004-2-fail.json",
+    "platform": "flowise",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec008-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-sec008-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-sec008-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-sec008-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-rel001-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel001-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel001-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel001-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "make-rel001-1-fail.json",
+    "platform": "make",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "make-rel001-2-fail.json",
+    "platform": "make",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel002-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel002-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel002-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel002-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel011-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel011-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel011-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel011-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel004-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-rel004-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-rel004-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-rel004-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-per001-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per001-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per001-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per001-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per013-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per013-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per013-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per013-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "make-per013-1-fail.json",
+    "platform": "make",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "make-per013-2-fail.json",
+    "platform": "make",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per026-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-per026-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-per026-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-per026-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-prv001-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv001-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv001-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv001-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "flowise-prv001-1-fail.json",
+    "platform": "flowise",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "flowise-prv001-2-fail.json",
+    "platform": "flowise",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv003-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-prv003-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-prv003-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-prv003-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "zapier-prv003-1-fail.json",
+    "platform": "zapier",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "zapier-prv003-2-fail.json",
+    "platform": "zapier",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-mnt001-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-mnt001-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-mnt001-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-mnt001-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-cmp001-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp001-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp001-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp001-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp003-1-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  },
+  {
+    "file": "n8n-cmp003-2-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  },
+  {
+    "file": "n8n-cmp003-3-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  },
+  {
+    "file": "n8n-cmp003-4-fail.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  },
+  {
+    "file": "n8n-sec001-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "flowise-sec001-1-pass.json",
+    "platform": "flowise",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "flowise-sec001-2-pass.json",
+    "platform": "flowise",
+    "ruleId": "sec001",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded API key in Code node"
+  },
+  {
+    "file": "n8n-sec001b-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec001b-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec001b-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec001b-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "zapier-sec001b-1-pass.json",
+    "platform": "zapier",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "zapier-sec001b-2-pass.json",
+    "platform": "zapier",
+    "ruleId": "sec001b",
+    "category": "SECURITY",
+    "flawLabel": "Hardcoded Bearer token in HTTP header"
+  },
+  {
+    "file": "n8n-sec002-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec002-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec002-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec002-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec002",
+    "category": "SECURITY",
+    "flawLabel": "Unauthenticated webhook trigger"
+  },
+  {
+    "file": "n8n-sec003-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec003-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec003-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec003-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "make-sec003-1-pass.json",
+    "platform": "make",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "make-sec003-2-pass.json",
+    "platform": "make",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "zapier-sec003-1-pass.json",
+    "platform": "zapier",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "zapier-sec003-2-pass.json",
+    "platform": "zapier",
+    "ruleId": "sec003",
+    "category": "SECURITY",
+    "flawLabel": "HTTP (not HTTPS) egress to external host"
+  },
+  {
+    "file": "n8n-sec004-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec004-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec004-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec004-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "flowise-sec004-1-pass.json",
+    "platform": "flowise",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "flowise-sec004-2-pass.json",
+    "platform": "flowise",
+    "ruleId": "sec004",
+    "category": "SECURITY",
+    "flawLabel": "eval() / child_process in Code node"
+  },
+  {
+    "file": "n8n-sec008-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-sec008-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-sec008-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-sec008-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "sec008",
+    "category": "SECURITY",
+    "flawLabel": "SQL injection via string concatenation"
+  },
+  {
+    "file": "n8n-rel001-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel001-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel001-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel001-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "make-rel001-1-pass.json",
+    "platform": "make",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "make-rel001-2-pass.json",
+    "platform": "make",
+    "ruleId": "rel001",
+    "category": "RELIABILITY",
+    "flawLabel": "HTTP node with no error handling branch"
+  },
+  {
+    "file": "n8n-rel002-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel002-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel002-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel002-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel002",
+    "category": "RELIABILITY",
+    "flawLabel": "Unbounded SplitInBatches loop (no maxItems)"
+  },
+  {
+    "file": "n8n-rel011-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel011-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel011-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel011-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel011",
+    "category": "RELIABILITY",
+    "flawLabel": "Potential infinite loop (self-referencing connection)"
+  },
+  {
+    "file": "n8n-rel004-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-rel004-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-rel004-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-rel004-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "rel004",
+    "category": "RELIABILITY",
+    "flawLabel": "Missing global Error Trigger"
+  },
+  {
+    "file": "n8n-per001-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per001-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per001-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per001-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "per001",
+    "category": "PERFORMANCE",
+    "flawLabel": "N+1 HTTP call inside a loop"
+  },
+  {
+    "file": "n8n-per013-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per013-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per013-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per013-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "make-per013-1-pass.json",
+    "platform": "make",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "make-per013-2-pass.json",
+    "platform": "make",
+    "ruleId": "per013",
+    "category": "PERFORMANCE",
+    "flawLabel": "Verbose debug logging enabled"
+  },
+  {
+    "file": "n8n-per026-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-per026-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-per026-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-per026-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "per026",
+    "category": "PERFORMANCE",
+    "flawLabel": "O(n²) nested loop in Code node"
+  },
+  {
+    "file": "n8n-prv001-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv001-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv001-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv001-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "flowise-prv001-1-pass.json",
+    "platform": "flowise",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "flowise-prv001-2-pass.json",
+    "platform": "flowise",
+    "ruleId": "prv001",
+    "category": "PRIVACY",
+    "flawLabel": "PII in console.log inside Code node"
+  },
+  {
+    "file": "n8n-prv003-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-prv003-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-prv003-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-prv003-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "zapier-prv003-1-pass.json",
+    "platform": "zapier",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "zapier-prv003-2-pass.json",
+    "platform": "zapier",
+    "ruleId": "prv003",
+    "category": "PRIVACY",
+    "flawLabel": "Outbound HTTP sends raw PII payload"
+  },
+  {
+    "file": "n8n-mnt001-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-mnt001-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-mnt001-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-mnt001-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "mnt001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Dead-end / orphan node (no outgoing connection)"
+  },
+  {
+    "file": "n8n-cmp001-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp001-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp001-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp001-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp001",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Deprecated node type (n8n-nodes-base.function)"
+  },
+  {
+    "file": "n8n-cmp003-1-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  },
+  {
+    "file": "n8n-cmp003-2-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  },
+  {
+    "file": "n8n-cmp003-3-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  },
+  {
+    "file": "n8n-cmp003-4-pass.json",
+    "platform": "n8n",
+    "ruleId": "cmp003",
+    "category": "ARCHITECTURE",
+    "flawLabel": "Outdated node typeVersion (httpRequest v1)"
+  }
+]

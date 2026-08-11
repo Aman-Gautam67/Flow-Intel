@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
           memory:           scores.memoryScore,
           resilience:       scores.resilienceScore,
           privacy:          scores.privacyScore,
-          aiGuardrails:     scores.aiGuardrailsScore ?? 100,
+          aiGuardrails:     scores.aiGuardrailsScore ?? null,
           estimatedCostUsd: scores.estimatedCostUsd,
         },
         violations: violations.map((v) => ({

@@ -1,0 +1,69 @@
+{
+  "name": "[QA] O(n²) nested loop in Code node (v1)",
+  "nodes": [
+    {
+      "id": "trigger-0",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "per026-node-0",
+      "name": "Deduplicate 0",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const itemsIn = items;\nfor(let i=0;i<itemsIn.length;i++){\n  for(let j=0;j<itemsIn.length;j++){\n    if(itemsIn[i].json.id === itemsIn[j].json.id && i!==j){\n      itemsIn[i].json.duplicate=true;\n    }\n  }\n}\nreturn itemsIn;"
+      }
+    },
+    {
+      "id": "flowintel-injected-error-trigger",
+      "name": "Error Trigger [Auto-Injected]",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "parameters": {
+        "notes": "Auto-injected by FlowIntel remediation engine. Wire to your preferred alert channel."
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notify On Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

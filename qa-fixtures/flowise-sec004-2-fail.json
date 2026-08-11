@@ -1,0 +1,42 @@
+{
+  "name": "[QA] eval() / child_process in Code node (v2)",
+  "nodes": [
+    {
+      "id": "trigger-1",
+      "position": {
+        "x": 200,
+        "y": 300
+      },
+      "type": "chatInput",
+      "data": {
+        "id": "trigger-1",
+        "label": "Chat Input",
+        "name": "chatInput",
+        "type": "Chain"
+      }
+    },
+    {
+      "id": "sec004-node-1",
+      "position": {
+        "x": 450,
+        "y": 300
+      },
+      "type": "code",
+      "data": {
+        "id": "sec004-node-1",
+        "label": "Exec 1",
+        "name": "code",
+        "type": "Chain",
+        "code": "const fn = new Function(data); fn();\nreturn items;"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-0",
+      "source": "trigger-1",
+      "target": "sec004-node-1",
+      "type": "buttonedge"
+    }
+  ]
+}

@@ -41,7 +41,11 @@ function findingToFlag(finding: Finding): AuditFlag {
     INFO:     "INFO",
   };
 
-  // Map v2 category to legacy category
+  // Map v2 category to legacy 6-bucket category.
+  // NOTE: OBSERVABILITY, MAINTAINABILITY, COMPATIBILITY, and DOCUMENTATION are all
+  // folded into "HYGIENE" here for backward compatibility with DB columns and score rings.
+  // The real v2 category is preserved in the `v2Category` field so the UI can show
+  // "Compatibility" or "Observability" instead of the collapsed "Hygiene" label.
   const categoryMap: Record<string, AuditFlag["category"]> = {
     SECURITY:          "SECURITY",
     RELIABILITY:       "RELIABILITY",
@@ -60,6 +64,9 @@ function findingToFlag(finding: Finding): AuditFlag {
     rule: finding.ruleId,
     severity: severityMap[finding.severity] ?? "WARNING",
     category: categoryMap[finding.category] ?? "HYGIENE",
+    // Preserve the real v2 category so UI components can display it without
+    // showing the misleading "Hygiene" label for Compatibility/Observability flags
+    v2Category: finding.category,
     title: finding.ruleName,
     detail: finding.evidence.summary + " — " + finding.humanExplanation.slice(0, 120),
     nodeName: finding.location.nodeName,

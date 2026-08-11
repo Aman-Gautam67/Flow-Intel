@@ -29,10 +29,12 @@ function getGrade(score: number): { grade: string; color: string } {
 
 function overallScore(r: AnalysisResult): number {
   const s = r.scores;
-  return s.overallScore ?? Math.round(
-    (s.healthScore + (s.securityScore ?? 100) + s.complexityScore + s.reliabilityScore +
-     s.debtScore + s.memoryScore + s.resilienceScore + s.privacyScore + (s.aiGuardrailsScore ?? 100)) / 9
-  );
+  if (s.overallScore != null) return s.overallScore;
+  const dims = [
+    s.healthScore, s.securityScore, s.complexityScore, s.reliabilityScore,
+    s.debtScore, s.memoryScore, s.resilienceScore, s.privacyScore, s.aiGuardrailsScore,
+  ].filter((v): v is number => v != null);
+  return dims.length > 0 ? Math.round(dims.reduce((a, b) => a + b, 0) / dims.length) : 100;
 }
 
 interface BulkWorkspaceProps {

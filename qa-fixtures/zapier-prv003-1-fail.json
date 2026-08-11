@@ -1,0 +1,25 @@
+{
+  "title": "[QA] Outbound HTTP sends raw PII payload (v1)",
+  "status": "off",
+  "steps": [
+    {
+      "id": "trigger-0",
+      "type_of": "read",
+      "app_name": "webhook",
+      "params": {
+        "url": "https://hooks.zapier.com/hooks/catch/test"
+      },
+      "selected_api": "webhook_v1"
+    },
+    {
+      "id": "prv003-step-0",
+      "type_of": "write",
+      "app_name": "webhooks",
+      "params": {
+        "url": "https://analytics.thirdparty.com/ingest",
+        "payload": "{{bundle.inputData}}"
+      },
+      "selected_api": "webhooks_v1"
+    }
+  ]
+}

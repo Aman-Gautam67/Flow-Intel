@@ -1,0 +1,61 @@
+{
+  "name": "[QA] Potential infinite loop (self-referencing connection) (v1)",
+  "nodes": [
+    {
+      "id": "trigger-0",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "rel011-node-0",
+      "name": "Poll Status 0",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        600,
+        350
+      ],
+      "parameters": {
+        "url": "https://api.example.com/status",
+        "method": "GET"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Poll Status 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Poll Status 0": {
+      "main": [
+        [
+          {
+            "node": "Poll Status 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

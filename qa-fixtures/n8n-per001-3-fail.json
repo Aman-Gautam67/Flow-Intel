@@ -1,0 +1,75 @@
+{
+  "name": "[QA] N+1 HTTP call inside a loop (v3)",
+  "nodes": [
+    {
+      "id": "trigger-2",
+      "name": "Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "per001-loop-2",
+      "name": "Batch Loop 2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        540,
+        300
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "per001-loop-2-http-child",
+      "name": "Fetch Record 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        740,
+        300
+      ],
+      "parameters": {
+        "url": "https://api.example.com/record/{{$json.id}}",
+        "method": "GET"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Batch Loop 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Batch Loop 2": {
+      "main": [
+        [
+          {
+            "node": "Fetch Record 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "flowintel-qa"
+  }
+}

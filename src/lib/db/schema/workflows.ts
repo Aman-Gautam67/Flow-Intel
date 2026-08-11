@@ -17,6 +17,7 @@ import { users } from "./users";
 // ─── Enums ────────────────────────────────────────────────────────────────────
 export const platformEnum = pgEnum("platform", [
   "N8N", "MAKE", "ZAPIER", "FLOWISE", "LANGFLOW",
+  "NODE_RED", "ACTIVEPIECES",
 ]);
 
 // ─── Workflows ────────────────────────────────────────────────────────────────
@@ -83,7 +84,7 @@ export const workflowScores = pgTable(
     memoryScore: integer("memory_score").notNull().default(100),
     resilienceScore: integer("resilience_score").notNull().default(100),
     privacyScore: integer("privacy_score").notNull().default(100),
-    aiGuardrailsScore: integer("ai_guardrails_score").notNull().default(100),
+    aiGuardrailsScore: integer("ai_guardrails_score"),
     estimatedCostUsd: doublePrecision("estimated_cost_usd").notNull().default(0),
     securityFlags: json("security_flags").notNull().default([]),
     resilienceFlags: json("resilience_flags").notNull().default([]),
