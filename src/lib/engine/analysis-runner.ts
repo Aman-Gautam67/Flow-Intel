@@ -27,7 +27,7 @@
  */
 
 import type { ParsedWorkflow } from "@/types";
-import type { AnalysisReport } from "./types";
+import type { AnalysisReport, Finding, FindingSeverity } from "./types";
 import { registerAllPacks } from "./rule-packs/index";
 import { registry }          from "./registry";
 import { fingerprintWorkflow } from "./fingerprint";
@@ -42,12 +42,90 @@ import { issueCertificate } from "./certification";
 import { createPassport, generateWorkflowId } from "./passport";
 import { estimateCost } from "@/lib/analyzer/cost-estimator";
 import { edgesToConnectionMap } from "@/lib/parsers/normalise";
+import { detectDrift, type DriftResult } from "./drift-database";
 
 import { DeepContextResolver } from "./deep-context";
 import { buildConnectionGraph } from "./graph";
 
 // Bootstrap: register all built-in rule packs once at module load
 registerAllPacks();
+
+function convertDriftToFindings(driftResults: DriftResult[], ast: ParsedWorkflow): Finding[] {
+  const findings: Finding[] = [];
+  for (const drift of driftResults) {
+    const { record, affectedNodes } = drift;
+    const severity: FindingSeverity =
+      record.severity === "BREAKING"
+        ? "CRITICAL"
+        : record.severity === "DEPRECATED"
+        ? "HIGH"
+        : record.severity === "WARNING"
+        ? "MEDIUM"
+        : "INFO";
+    const penaltyPoints =
+      severity === "CRITICAL"
+        ? 20
+        : severity === "HIGH"
+        ? 15
+        : severity === "MEDIUM"
+        ? 10
+        : 0;
+    const marketplaceBlocking = severity === "CRITICAL";
+
+    if (affectedNodes && affectedNodes.length > 0) {
+      for (const nodeName of affectedNodes) {
+        const matchedNode = ast.nodes.find((n) => n.name === nodeName);
+        const nodeId = matchedNode?.id ?? nodeName;
+        findings.push({
+          id: `DRIFT-${record.id}-${nodeId}`,
+          ruleId: record.id,
+          ruleName: record.summary,
+          severity,
+          category: "COMPATIBILITY",
+          location: {
+            nodeId,
+            nodeName,
+            nodeType: matchedNode?.type ?? record.component,
+          },
+          evidence: {
+            summary: record.summary,
+            detail: record.detail,
+            value: record.old,
+          },
+          humanExplanation: record.detail,
+          suggestedFix: record.suggested
+            ? `Upgrade / replace with: ${record.suggested}`
+            : "Refer to official documentation for migration steps.",
+          marketplaceBlocking,
+          docReference: record.docUrl,
+          penaltyPoints,
+        });
+      }
+    } else {
+      findings.push({
+        id: `DRIFT-${record.id}-root`,
+        ruleId: record.id,
+        ruleName: record.summary,
+        severity,
+        category: "COMPATIBILITY",
+        location: {},
+        evidence: {
+          summary: record.summary,
+          detail: record.detail,
+          value: record.old,
+        },
+        humanExplanation: record.detail,
+        suggestedFix: record.suggested
+          ? `Upgrade / replace with: ${record.suggested}`
+          : "Refer to official documentation for migration steps.",
+        marketplaceBlocking,
+        docReference: record.docUrl,
+        penaltyPoints,
+      });
+    }
+  }
+  return findings;
+}
 
 function ensureContext(ast: ParsedWorkflow) {
   if (process.env.DISABLE_DEEP_CONTEXT === "true") return;
@@ -85,8 +163,11 @@ export async function runAnalysis(
   // ── 1. Fingerprint ─────────────────────────────────────────────────────────
   const fingerprint = await fingerprintWorkflow(ast);
 
-  // ── 2. Execute all rules ───────────────────────────────────────────────────
+  // ── 2. Execute all rules & drift detection ──────────────────────────────────
   const findings = executeRules(ast, registry);
+  const driftResults = detectDrift(ast, ast.platform ?? "n8n");
+  const driftFindings = convertDriftToFindings(driftResults, ast);
+  findings.push(...driftFindings);
 
   // ── 3. Determine applicable categories ────────────────────────────────────
   const workflowContext = {
@@ -119,7 +200,7 @@ export async function runAnalysis(
     categoryScores,
   });
 
-  // ── 7. Create workflow passport ────────────────────────────────────────────
+  // ── 7. Create workflow passport ────────────────────────────────────
   const workflowId = generateWorkflowId(fingerprint.hash);
   const passport = createPassport({
     workflowId,
@@ -154,6 +235,7 @@ export async function runAnalysis(
     passport,
     fqiScore,
     estimatedMonthlyCostUsd,
+    driftResults,
   };
 }
 
@@ -168,6 +250,9 @@ export function runAnalysisSync(ast: ParsedWorkflow): Omit<AnalysisReport, "fing
 } {
   ensureContext(ast);
   const findings = executeRules(ast, registry);
+  const driftResults = detectDrift(ast, ast.platform ?? "n8n");
+  const driftFindings = convertDriftToFindings(driftResults, ast);
+  findings.push(...driftFindings);
 
   const workflowContext = {
     hasHttpNodes:  ast.httpNodesCount > 0,
@@ -200,5 +285,6 @@ export function runAnalysisSync(ast: ParsedWorkflow): Omit<AnalysisReport, "fing
     passport: null,
     fqiScore,
     estimatedMonthlyCostUsd,
+    driftResults,
   };
 }

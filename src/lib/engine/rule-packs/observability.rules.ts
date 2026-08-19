@@ -56,7 +56,7 @@ export const OBSERVABILITY_PACK: RulePackManifest = {
       description: "Workflow contains no execution ID capture or timestamping for audit purposes.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 5,
+      penaltyPoints: 8,
       docReference: "https://flowintel.io/rules/OBS-001",
       detect(ast: ParsedWorkflow): Finding[] {
         // Only flag workflows with more than 3 nodes to avoid noise on simple automations
@@ -124,7 +124,7 @@ export const OBSERVABILITY_PACK: RulePackManifest = {
       category: "OBSERVABILITY",
       severity: "INFO",
       description: "Workflow has no description metadata, making it hard to understand without reading every node.",
-      enabled: true,
+      enabled: false,
       marketplaceBlocking: false,
       penaltyPoints: 0,
       docReference: "https://flowintel.io/rules/OBS-003",
@@ -150,7 +150,7 @@ export const OBSERVABILITY_PACK: RulePackManifest = {
           suggestedFix: "Add a description to the workflow in Settings → Workflow description. Include purpose, trigger conditions, and key data flows.",
           marketplaceBlocking: false,
           docReference: "https://flowintel.io/rules/OBS-003",
-          penaltyPoints: 3,
+          penaltyPoints: 0,
         }];
       },
     },

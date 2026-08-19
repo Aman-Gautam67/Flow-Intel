@@ -19,6 +19,7 @@ export const PLATFORMS = [
   { value: "ACTIVEPIECES", label: "Activepieces" },
   { value: "AIRFLOW",     label: "Airflow" },
   { value: "PREFECT",     label: "Prefect" },
+  { value: "POWER_AUTOMATE", label: "Power Automate" },
 ] as const;
 
 // Quick-filter chips shown horizontally above results

@@ -68,7 +68,7 @@ export const COST_OPTIMIZATION_PACK: RulePackManifest = {
       category: "COST_OPTIMIZATION",
       severity: "MEDIUM",
       description: "Two or more AI nodes with the same model and prompt — duplicate cost with no benefit.",
-      enabled: true,
+      enabled: false,
       marketplaceBlocking: false,
       penaltyPoints: 10,
       docReference: "https://flowintel.io/rules/CST-001",
@@ -114,7 +114,7 @@ export const COST_OPTIMIZATION_PACK: RulePackManifest = {
       description: "Same HTTP endpoint is called multiple times in the same workflow execution.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 5,
+      penaltyPoints: 6,
       docReference: "https://flowintel.io/rules/CST-002",
       detect(ast: ParsedWorkflow): Finding[] {
         const httpNodes = ast.nodes.filter((n) => n.type === "n8n-nodes-base.httpRequest");
@@ -184,7 +184,7 @@ export const COST_OPTIMIZATION_PACK: RulePackManifest = {
             suggestedFix: `Move "${node.name}" before the loop and reference its output inside the loop using {{ $('${node.name}').item.json }}.`,
             marketplaceBlocking: false,
             docReference: "https://flowintel.io/rules/CST-003",
-            penaltyPoints: 4,
+            penaltyPoints: 0,
           });
         }
         return findings;

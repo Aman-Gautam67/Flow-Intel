@@ -237,7 +237,7 @@ export const PRIVACY_EXT_B: RulePackManifest = {
       category: "PRIVACY",
       severity: "MEDIUM",
       description: "Workflow sends data to a third-party service not listed as an approved subprocessor.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
       docReference: "https://flowintel.io/rules/PRV-020",
       detect(ast: ParsedWorkflow): Finding[] {
         const httpNodes = ast.nodes.filter((n) => n.type === "n8n-nodes-base.httpRequest");

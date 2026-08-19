@@ -1,5 +1,5 @@
 /**
- * FlowIntel Security Extension B — SEC-021 to SEC-035
+ * FlowIntel Security Extension B — SEC-021 to SEC-040
  */
 import type { Finding, ParsedWorkflow, RulePackManifest } from "../types";
 
@@ -14,7 +14,7 @@ export const SECURITY_EXT_B: RulePackManifest = {
   id: "flowintel-security-ext-b",
   name: "FlowIntel Security Extension B",
   version: "2.0.0",
-  description: "SEC-021 through SEC-035: CORS, path traversal, debug flags, data exfil, and more.",
+  description: "SEC-021 through SEC-040: CORS, path traversal, debug flags, data exfil, SSL/TLS, command injection, SSRF, excessive agency, and prompt boundary tags.",
   rules: [
     {
       id: "SEC-021",
@@ -540,6 +540,337 @@ export const SECURITY_EXT_B: RulePackManifest = {
           docReference: "https://flowintel.io/rules/SEC-035",
           penaltyPoints: 15,
         }];
+      },
+    },
+
+    {
+      id: "SEC-036",
+      name: "SSL/TLS Certificate Verification Disabled",
+      category: "SECURITY",
+      severity: "HIGH",
+      description: "Node parameters disable SSL/TLS certificate validation (ignoreSslIssues/rejectUnauthorized: false), leaving connections vulnerable to man-in-the-middle attacks.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 15,
+      docReference: "https://flowintel.io/rules/SEC-036",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const s = paramStr(node);
+            if (!s.includes("ignoreSsl") && !s.includes("rejectUnauthorized") && !s.includes("allowUnauthorized") && !s.includes("insecureSkipVerify") && !s.includes("strictSSL")) continue;
+
+            const p = (node.parameters ?? {}) as Record<string, unknown>;
+            const opts = (p.options ?? {}) as Record<string, unknown>;
+            const tls = (p.tls ?? opts.tls ?? {}) as Record<string, unknown>;
+
+            const isDisabled =
+              p.ignoreSslIssues === true ||
+              opts.ignoreSslIssues === true ||
+              p.allowUnauthorizedCerts === true ||
+              opts.allowUnauthorizedCerts === true ||
+              p.insecureSkipVerify === true ||
+              p.rejectUnauthorized === false ||
+              opts.rejectUnauthorized === false ||
+              tls.rejectUnauthorized === false ||
+              /["']?(ignoreSslIssues|allowUnauthorizedCerts|insecureSkipVerify)["']?\s*:\s*true/i.test(s) ||
+              /["']?(rejectUnauthorized|strictSSL)["']?\s*:\s*false/i.test(s);
+
+            if (isDisabled) {
+              findings.push({
+                id: fid("SEC-036", node.id),
+                ruleId: "SEC-036",
+                ruleName: "SSL/TLS Certificate Verification Disabled",
+                severity: "HIGH",
+                category: "SECURITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "SSL/TLS certificate verification is disabled",
+                  detail: `"${node.name}" disables SSL/TLS validation (ignoreSslIssues / rejectUnauthorized: false), exposing traffic to man-in-the-middle (MITM) interception.`,
+                },
+                humanExplanation: "Disabling TLS verification allows attackers on the network path to intercept, decrypt, and alter sensitive API payloads, tokens, and credentials.",
+                suggestedFix: "Re-enable SSL certificate validation by removing ignoreSslIssues / rejectUnauthorized: false. Install valid CA certificates on the server if using internal services.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/SEC-036",
+                penaltyPoints: 15,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "SEC-037",
+      name: "Command Injection in Native Execute/SSH Nodes",
+      category: "SECURITY",
+      severity: "CRITICAL",
+      description: "Native executeCommand or SSH node executes a shell command containing unescaped dynamic variables ($json.*), enabling remote command execution (RCE).",
+      enabled: true,
+      marketplaceBlocking: true,
+      penaltyPoints: 30,
+      docReference: "https://flowintel.io/rules/SEC-037",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const CMD_NODE_TYPES = ["executecommand", "ssh", "bash", "terminal", "systemcommand"];
+          for (const node of ast.nodes) {
+            const t = node.type.toLowerCase();
+            const isCmdNode = CMD_NODE_TYPES.some((ct) => t.includes(ct));
+            if (!isCmdNode) continue;
+
+            const s = paramStr(node);
+            const p = (node.parameters ?? {}) as Record<string, unknown>;
+            const cmdVal = String(p.command ?? p.cmd ?? s);
+
+            const hasUnescapedJson =
+              /\$json\.[a-zA-Z0-9_.]+/i.test(cmdVal) ||
+              /\$node\[.+?\]\.json/i.test(cmdVal) ||
+              /\{\{.*\$json\..*\}\}/i.test(cmdVal) ||
+              /\$\{.*\$json\..*\}/i.test(cmdVal);
+
+            if (hasUnescapedJson) {
+              findings.push({
+                id: fid("SEC-037", node.id),
+                ruleId: "SEC-037",
+                ruleName: "Command Injection in Native Execute/SSH Nodes",
+                severity: "CRITICAL",
+                category: "SECURITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Unescaped dynamic expression in shell command",
+                  detail: `"${node.name}" interpolates unescaped user input ($json.*) directly into shell command arguments: "${cmdVal.slice(0, 100)}".`,
+                },
+                humanExplanation: "Interpolating unescaped dynamic input into shell commands allows remote attackers to inject arbitrary shell commands (e.g. via ; rm -rf or $(curl ...)).",
+                suggestedFix: "Use parameterized arguments or strictly sanitize/whitelist dynamic variables using regex (e.g. /^[a-zA-Z0-9_-]+$/) before passing to shell execution.",
+                marketplaceBlocking: true,
+                docReference: "https://flowintel.io/rules/SEC-037",
+                penaltyPoints: 30,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "SEC-038",
+      name: "Cloud Metadata Endpoint Access",
+      category: "SECURITY",
+      severity: "CRITICAL",
+      description: "HTTP node targets sensitive cloud metadata service endpoints (169.254.169.254, metadata.google.internal, 169.254.170.2), creating a critical SSRF vulnerability.",
+      enabled: true,
+      marketplaceBlocking: true,
+      penaltyPoints: 30,
+      docReference: "https://flowintel.io/rules/SEC-038",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const METADATA_TARGETS = [
+            "169.254.169.254",
+            "metadata.google.internal",
+            "169.254.170.2",
+            "metadata.internal",
+          ];
+          for (const node of ast.nodes) {
+            const s = paramStr(node);
+            const urlMeta = String(node.httpMeta?.url ?? "");
+            if (!urlMeta.includes("169.254.") && !urlMeta.includes("metadata.") && !s.includes("169.254.") && !s.includes("metadata.")) continue;
+
+            const matched = METADATA_TARGETS.find((target) =>
+              urlMeta.includes(target) || s.includes(target)
+            );
+
+            if (matched) {
+              findings.push({
+                id: fid("SEC-038", node.id),
+                ruleId: "SEC-038",
+                ruleName: "Cloud Metadata Endpoint Access",
+                severity: "CRITICAL",
+                category: "SECURITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: `Cloud instance metadata endpoint accessed: ${matched}`,
+                  detail: `"${node.name}" makes requests to cloud instance metadata endpoint "${matched}". This allows attackers to steal cloud IAM credentials, instance tokens, and cluster secrets.`,
+                },
+                humanExplanation: "Cloud metadata endpoints (IMDS) expose instance IAM credentials, service account tokens, and bootstrap secrets to any internal HTTP request.",
+                suggestedFix: "Remove requests targeting cloud metadata IPs (169.254.169.254). Use IAM roles or explicit credential providers rather than instance metadata endpoints.",
+                marketplaceBlocking: true,
+                docReference: "https://flowintel.io/rules/SEC-038",
+                penaltyPoints: 30,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "SEC-039",
+      name: "Excessive Agency in AI Agent",
+      category: "SECURITY",
+      severity: "HIGH",
+      description: "AI agent node has destructive tools attached (executeCommand, database drop/delete, payments, email sending) without human-in-the-loop approval guardrails.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 20,
+      docReference: "https://flowintel.io/rules/SEC-039",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const AI_AGENT_TYPES = ["agent", "chatmodel", "langchain", "openai_agents", "crewai", "swarm"];
+          const isAgentWorkflow = ast.nodes.some((n) =>
+            n.isAi || AI_AGENT_TYPES.some((at) => n.type.toLowerCase().includes(at))
+          );
+          if (!isAgentWorkflow) return [];
+
+          // Check for human approval node in workflow
+          const hasApprovalNode = ast.nodes.some((n) => {
+            const s = paramStr(n).toLowerCase();
+            const t = n.type.toLowerCase();
+            return (
+              t.includes("approval") ||
+              t.includes("manual") ||
+              t.includes("wait") ||
+              /human_in_the_loop|requireapproval|human_input_mode['":\s]+always|needs_approval/i.test(s)
+            );
+          });
+          if (hasApprovalNode) return [];
+
+          const DESTRUCTIVE_PATTERNS = [
+            { key: "executeCommand", match: (n: typeof ast.nodes[0]) => n.type.toLowerCase().includes("executecommand") || n.type.toLowerCase().includes("ssh") },
+            { key: "sql_delete_drop", match: (n: typeof ast.nodes[0]) => {
+              const s = paramStr(n).toLowerCase();
+              return ["postgres", "mysql", "mongodb", "supabase", "database", "sql"].some(db => n.type.toLowerCase().includes(db)) &&
+                /(delete|drop|truncate|destroy|remove)\b/i.test(s);
+            }},
+            { key: "stripe_charge", match: (n: typeof ast.nodes[0]) => {
+              const s = paramStr(n).toLowerCase();
+              return n.type.toLowerCase().includes("stripe") && /(charge|payment|refund|transfer|payout)/i.test(s);
+            }},
+            { key: "send_email", match: (n: typeof ast.nodes[0]) => {
+              const t = n.type.toLowerCase();
+              return t.includes("sendemail") || t.includes("emailsend") || (t.includes("gmail") && /send/i.test(paramStr(n))) || (t.includes("office365") && /send/i.test(paramStr(n)));
+            }},
+          ];
+
+          // Precompute hasDestructiveNode ONCE
+          const hasDestructiveNode = ast.nodes.some((n) =>
+            DESTRUCTIVE_PATTERNS.some((dp) => dp.match(n))
+          );
+
+          const agentNodes = ast.nodes.filter((n) =>
+            n.isAi || AI_AGENT_TYPES.some((at) => n.type.toLowerCase().includes(at))
+          );
+
+          for (const agentNode of agentNodes) {
+            const s = paramStr(agentNode).toLowerCase();
+            const hasAttachedDestructiveTool =
+              /(executecommand|ssh|terminal|bash|shell|stripe.*charge|process_refund|delete.*db|drop.*table|truncate|send_email|sendemail)/i.test(s);
+
+            if (hasAttachedDestructiveTool || hasDestructiveNode) {
+              findings.push({
+                id: fid("SEC-039", agentNode.id),
+                ruleId: "SEC-039",
+                ruleName: "Excessive Agency in AI Agent",
+                severity: "HIGH",
+                category: "SECURITY",
+                location: { nodeId: agentNode.id, nodeName: agentNode.name, nodeType: agentNode.type },
+                evidence: {
+                  summary: "Autonomous AI agent has destructive execution privileges without human approval",
+                  detail: `"${agentNode.name}" has access to destructive tools/actions (executeCommand, database mutation, payments, or email dispatch) without an approval or human-in-the-loop verification step.`,
+                },
+                humanExplanation: "LLMs are probabilistic and practical. Granting autonomous access to destructive actions (shell execution, database drops, payments, emails) without human confirmation risks unintended catastrophic operations.",
+                suggestedFix: "Add a Human-in-the-Loop approval gate (e.g. Wait node with webhook confirmation, Slack interactive approval, or human_input_mode='ALWAYS') before executing destructive actions.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/SEC-039",
+                penaltyPoints: 20,
+              });
+              break;
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "SEC-040",
+      name: "Prompt Injection Missing Boundary Tags",
+      category: "SECURITY",
+      severity: "MEDIUM",
+      description: "AI prompt constructs user input ($json.*) without XML or tag-based boundary isolation tags (<data>, <user_input>, <context>, [USER_DATA]).",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 10,
+      docReference: "https://flowintel.io/rules/SEC-040",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const AI_TYPES = ["langchain", "openai", "anthropic", "llm", "chatmodel", "agent"];
+          const PROMPT_FIELDS = /^(prompt|systemMessage|humanMessage|userMessage|text|message|input|query|content|template)/i;
+
+          for (const node of ast.nodes) {
+            const t = node.type.toLowerCase();
+            if (!node.isAi && !AI_TYPES.some((a) => t.includes(a))) continue;
+
+            const s = paramStr(node);
+            if (!s.includes("$json") && !s.includes("$node") && !s.includes("{{")) continue;
+
+            const params = (node.parameters ?? {}) as Record<string, unknown>;
+
+            // Dynamic input detection
+            const hasDynamicInput =
+              /\$json\.\w+/.test(s) ||
+              /\$node\[/.test(s) ||
+              /\{\{.*(userInput|user_input|query|message|body|prompt|data|text).*/i.test(s);
+
+            const promptHasDynamic = Object.entries(params).some(([k, v]) => {
+              if (!PROMPT_FIELDS.test(k)) return false;
+              const val = String(v ?? "");
+              return /\$json\.\w+/.test(val) || /\$node\[/.test(val) || /\{\{.*\}\}/.test(val);
+            }) || (hasDynamicInput && PROMPT_FIELDS.test(JSON.stringify(Object.keys(params))));
+
+            if (!promptHasDynamic && !hasDynamicInput) continue;
+
+            // Boundary tag verification
+            const hasBoundaryTags = /<data>|<user_input>|<context>|\[user_data\]/i.test(s);
+
+            if (!hasBoundaryTags) {
+              findings.push({
+                id: fid("SEC-040", node.id),
+                ruleId: "SEC-040",
+                ruleName: "Prompt Injection Missing Boundary Tags",
+                severity: "MEDIUM",
+                category: "SECURITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Dynamic user data passed to prompt without boundary tags",
+                  detail: `"${node.name}" interpolates dynamic inputs directly into the prompt without enclosing them in boundary isolation tags like <data>, <user_input>, <context>, or [USER_DATA].`,
+                },
+                humanExplanation: "Without boundary tags (e.g. <user_input>{{$json.text}}</user_input>), the LLM cannot distinguish system instructions from untrusted data, increasing prompt injection vulnerability.",
+                suggestedFix: "Wrap all dynamic user variables in boundary tags (e.g. '<user_input>{{$json.input}}</user_input>') and instruct the model to treat content within those tags purely as data.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/SEC-040",
+                penaltyPoints: 10,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
       },
     },
   ],

@@ -83,9 +83,9 @@ export const DOCUMENTATION_PACK: RulePackManifest = {
       category: "DOCUMENTATION",
       severity: "LOW",
       description: "Workflow uses $env.VARIABLE_NAME references without documenting required environment variables.",
-      enabled: true,
+      enabled: false,
       marketplaceBlocking: false,
-      penaltyPoints: 5,
+      penaltyPoints: 6,
       docReference: "https://flowintel.io/rules/DOC-002",
       detect(ast: ParsedWorkflow): Finding[] {
         const envRefs = countEnvReferences(ast);

@@ -64,7 +64,7 @@ export const IDEMPOTENCY_PACK: RulePackManifest = {
       description: "POST/PATCH HTTP requests or DB write nodes without an idempotency key may produce duplicate records on retry.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 10,
+      penaltyPoints: 15,
       docReference: "https://flowintel.io/rules/IDP-001",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];

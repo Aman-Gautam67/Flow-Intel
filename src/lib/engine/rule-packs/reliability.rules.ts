@@ -161,7 +161,7 @@ export const RELIABILITY_PACK: RulePackManifest = {
       description: "HTTP calls inside a loop with no delay risk rate-limit errors from external APIs.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 10,
+      penaltyPoints: 12,
       docReference: "https://flowintel.io/rules/REL-003",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
@@ -256,7 +256,7 @@ export const RELIABILITY_PACK: RulePackManifest = {
       description: "Workflows without a notification node on the error path fail silently in production.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 5,
+      penaltyPoints: 8,
       docReference: "https://flowintel.io/rules/REL-005",
       detect(ast: ParsedWorkflow): Finding[] {
         // Applicable only to workflows with at least one network node

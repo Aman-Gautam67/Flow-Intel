@@ -1,5 +1,5 @@
 /**
- * FlowIntel Reliability Extension B — REL-019 to REL-030
+ * FlowIntel Reliability Extension B — REL-019 to REL-034
  */
 import type { Finding, ParsedWorkflow, RulePackManifest } from "../types";
 
@@ -10,7 +10,7 @@ export const RELIABILITY_EXT_B: RulePackManifest = {
   id: "flowintel-reliability-ext-b",
   name: "FlowIntel Reliability Extension B",
   version: "2.0.0",
-  description: "REL-019 through REL-030: recovery gaps, missing alerts, safe-shutdown, partition tolerance.",
+  description: "REL-019 through REL-034: recovery gaps, missing alerts, safe-shutdown, partition tolerance, LLM JSON parsing, retry backoff, and batch isolation.",
   rules: [
     {
       id: "REL-019",
@@ -394,6 +394,280 @@ export const RELIABILITY_EXT_B: RulePackManifest = {
           suggestedFix: "Add a Respond to Webhook node early in the workflow that immediately returns HTTP 200 to acknowledge receipt.",
           marketplaceBlocking: false, docReference: "https://flowintel.io/rules/REL-030", penaltyPoints: 10,
         }];
+      },
+    },
+
+    {
+      id: "REL-031",
+      name: "Fragile JSON Parsing on LLM Output",
+      category: "RELIABILITY",
+      severity: "HIGH",
+      description: "Code node invokes JSON.parse on upstream LLM output without stripping markdown code fences or wrapping in try/catch.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 15,
+      docReference: "https://flowintel.io/rules/REL-031",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const hasUpstreamAi = ast.aiNodesCount > 0 || ast.nodes.some((n) => n.isAi);
+
+          for (const node of ast.nodes) {
+            if (!node.isCode) continue;
+            const code = String(node.codeMeta?.codeSnippet ?? ps(node));
+
+            if (!code.includes("JSON.parse")) continue;
+
+            const referencesAi =
+              hasUpstreamAi ||
+              /(ai|llm|chat|openai|anthropic|completion|response|model|prompt|gpt)/i.test(code);
+
+            if (!referencesAi) continue;
+
+            const hasTryCatch = /try\s*\{[\s\S]*JSON\.parse[\s\S]*\}\s*catch/i.test(code);
+            const hasFenceStripping =
+              /replace\s*\(\s*\/[`]{3}(json)?|replace\s*\(\s*["']```(json)?/i.test(code) ||
+              /replace\s*\(\s*[`"']```/i.test(code) ||
+              /match\s*\(\s*\/\{[\s\S]*\}/i.test(code) ||
+              /substring|slice/i.test(code);
+
+            if (!hasTryCatch || !hasFenceStripping) {
+              findings.push({
+                id: fid("REL-031", node.id),
+                ruleId: "REL-031",
+                ruleName: "Fragile JSON Parsing on LLM Output",
+                severity: "HIGH",
+                category: "RELIABILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "JSON.parse on LLM output without markdown fence stripping or try-catch",
+                  detail: `"${node.name}" uses JSON.parse on AI output without stripping markdown fences (\`\`\`json) or wrapping in try/catch. LLMs frequently return markdown-wrapped JSON which causes JSON.parse to throw.`,
+                },
+                humanExplanation: "LLM responses often wrap JSON in ```json ... ``` markdown fences or add conversational preamble. Direct JSON.parse without fence stripping or error handling causes workflow crashes.",
+                suggestedFix: "1) Strip markdown fences: text.replace(/```json\\n?|```/g, '').trim(). 2) Wrap JSON.parse in a try/catch block with fallback handling.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/REL-031",
+                penaltyPoints: 15,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "REL-032",
+      name: "Make/PA Error Directive Recognition",
+      category: "RELIABILITY",
+      severity: "INFO",
+      description: "Recognizes and verifies valid platform error handling directives (Make BasicBreak/Resume/Ignore/Commit/Rollback and Power Automate runAfter Failed/TimedOut).",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 0,
+      docReference: "https://flowintel.io/rules/REL-032",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const MAKE_DIRECTIVES = ["BasicBreak", "BasicResume", "BasicIgnore", "BasicCommit", "BasicRollback"];
+
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            const t = node.type;
+
+            const makeMatch = MAKE_DIRECTIVES.find((dir) => t.includes(dir) || s.includes(dir));
+            if (makeMatch) {
+              findings.push({
+                id: fid("REL-032", node.id),
+                ruleId: "REL-032",
+                ruleName: "Make/PA Error Directive Recognition",
+                severity: "INFO",
+                category: "RELIABILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: `Make error handling directive recognized: ${makeMatch}`,
+                  detail: `"${node.name}" uses Make native error directive "${makeMatch}" to handle downstream failures.`,
+                },
+                humanExplanation: "Make error directives (Break, Resume, Ignore, Commit, Rollback) provide platform-native resilience and error recovery.",
+                suggestedFix: "No action needed — native Make error directive recognized.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/REL-032",
+                penaltyPoints: 0,
+              });
+              continue;
+            }
+
+            const p = (node.parameters ?? {}) as Record<string, unknown>;
+            const runAfter = (p.runAfter ?? {}) as Record<string, unknown>;
+            const hasPaErrorHandling =
+              Object.values(runAfter).some((statuses) =>
+                Array.isArray(statuses) && statuses.some((st) => st === "Failed" || st === "TimedOut")
+              ) ||
+              (ast.edges.some((e) => e.target === node.id && e.type === "error"));
+
+            if (hasPaErrorHandling && (ast.platform === "POWER_AUTOMATE" || t.startsWith("powerautomate"))) {
+              findings.push({
+                id: fid("REL-032", node.id),
+                ruleId: "REL-032",
+                ruleName: "Make/PA Error Directive Recognition",
+                severity: "INFO",
+                category: "RELIABILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Power Automate runAfter error handler recognized",
+                  detail: `"${node.name}" is configured with runAfter Failed/TimedOut to catch and handle parent action errors.`,
+                },
+                humanExplanation: "Power Automate runAfter condition handlers allow workflows to intercept failures and execute recovery branches.",
+                suggestedFix: "No action needed — native Power Automate error handler recognized.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/REL-032",
+                penaltyPoints: 0,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "REL-033",
+      name: "Retry Without Exponential Backoff",
+      category: "RELIABILITY",
+      severity: "LOW",
+      description: "Node retries on failure (retryOnFail: true or maxTries > 1) but uses a fixed wait interval without exponential backoff.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 5,
+      docReference: "https://flowintel.io/rules/REL-033",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            if (!s.includes("retry") && !s.includes("maxTries")) continue;
+
+            const p = (node.parameters ?? {}) as Record<string, unknown>;
+            const opts = (p.options ?? {}) as Record<string, unknown>;
+
+            const hasRetry =
+              p.retryOnFail === true ||
+              opts.retryOnFail === true ||
+              (typeof p.maxTries === "number" && p.maxTries > 1) ||
+              (typeof opts.maxTries === "number" && (opts.maxTries as number) > 1) ||
+              /["']?(retryOnFail|auto_retry)["']?\s*:\s*true/i.test(s) ||
+              /["']?maxTries["']?\s*:\s*[2-9]/i.test(s);
+
+            if (!hasRetry) continue;
+
+            const hasExpBackoff =
+              p.waitBetweenTriesExponential === true ||
+              opts.waitBetweenTriesExponential === true ||
+              p.exponentialBackoff === true ||
+              opts.exponentialBackoff === true ||
+              /exponential|backoffFactor|backoff_factor|jitter/i.test(s);
+
+            if (!hasExpBackoff) {
+              findings.push({
+                id: fid("REL-033", node.id),
+                ruleId: "REL-033",
+                ruleName: "Retry Without Exponential Backoff",
+                severity: "LOW",
+                category: "RELIABILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Retry enabled with fixed wait interval (no exponential backoff)",
+                  detail: `"${node.name}" retries failed requests but does not enable exponential backoff. Retrying with static delays exacerbates server rate limits and network congestion.`,
+                },
+                humanExplanation: "Fixed-delay retries hit already-stressed servers at predictable intervals. Exponential backoff spreads out retry attempts, significantly increasing recovery success rates.",
+                suggestedFix: "Enable exponential backoff (waitBetweenTriesExponential: true or exponentialBackoff: true) and add randomized jitter to retry intervals.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/REL-033",
+                penaltyPoints: 5,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "REL-034",
+      name: "Missing Item-Level Error Isolation in Batch Loop",
+      category: "RELIABILITY",
+      severity: "MEDIUM",
+      description: "A splitInBatches or iteration loop processes items, but inner child nodes lack continueOnFail or error routing, causing an error on one item to abort the entire batch.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 8,
+      docReference: "https://flowintel.io/rules/REL-034",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const BATCH_LOOP_TYPES = ["n8n-nodes-base.splitinbatches", "iteration", "foreach", "loopnode"];
+          const batchNodes = ast.nodes.filter((n) =>
+            n.isLoop || BATCH_LOOP_TYPES.some((bt) => n.type.toLowerCase().includes(bt))
+          );
+
+          if (batchNodes.length === 0) return [];
+
+          const errorSourceSet = new Set(
+            ast.edges
+              .filter((e) => e.type === "error" || e.sourceHandle === "error" || e.sourceHandle === "1")
+              .map((e) => e.source)
+          );
+
+          const nonBatchActionNodes = ast.nodes.filter((n) =>
+            !n.isTrigger && !n.isLoop && (n.isHttp || n.isCode || n.type.includes("postgres") || n.type.includes("slack"))
+          );
+
+          const unisolatedNodes = nonBatchActionNodes.filter((n) => {
+            const p = (n.parameters ?? {}) as Record<string, unknown>;
+            const opts = (p.options ?? {}) as Record<string, unknown>;
+            const hasIsolation =
+              p.continueOnFail === true ||
+              opts.continueOnFail === true ||
+              p.onError === "continueRegularOutput" ||
+              p.onError === "continueErrorOutput" ||
+              opts.onError === "continueRegularOutput" ||
+              opts.onError === "continueErrorOutput" ||
+              errorSourceSet.has(n.id) ||
+              errorSourceSet.has(n.name);
+            return !hasIsolation;
+          });
+
+          if (unisolatedNodes.length > 0) {
+            for (const batchNode of batchNodes) {
+              findings.push({
+                id: fid("REL-034", batchNode.id),
+                ruleId: "REL-034",
+                ruleName: "Missing Item-Level Error Isolation in Batch Loop",
+                severity: "MEDIUM",
+                category: "RELIABILITY",
+                location: { nodeId: batchNode.id, nodeName: batchNode.name, nodeType: batchNode.type },
+                evidence: {
+                  summary: "Batch loop contains action nodes without continueOnFail error isolation",
+                  detail: `Batch loop "${batchNode.name}" contains ${unisolatedNodes.length} node(s) (e.g. "${unisolatedNodes[0]?.name}") that do not isolate item-level errors. A single failed item will crash the entire batch execution.`,
+                },
+                humanExplanation: "When processing items in batches, individual item failures should not crash processing of the remaining items in the loop.",
+                suggestedFix: `Enable 'Continue On Fail' or configure error routing on child nodes in the "${batchNode.name}" loop to isolate per-item errors.`,
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/REL-034",
+                penaltyPoints: 8,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
       },
     },
   ],

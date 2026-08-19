@@ -6,6 +6,7 @@
  */
 
 import type { ParsedWorkflow } from "@/types";
+import type { DriftResult } from "./drift-database";
 
 // ─── Re-export the universal AST so rule packs may import from either source ───
 // The canonical type name is ParsedWorkflow everywhere.
@@ -245,4 +246,6 @@ export interface AnalysisReport {
   fqiScore: number;
   /** Cost estimate */
   estimatedMonthlyCostUsd: number;
+  /** Documented compatibility drift results */
+  driftResults?: DriftResult[];
 }

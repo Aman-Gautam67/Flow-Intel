@@ -118,7 +118,7 @@ export const IDEMPOTENCY_EXT: RulePackManifest = {
       category: "IDEMPOTENCY",
       severity: "MEDIUM",
       description: "Slack/Discord notification sent directly from a webhook handler without event deduplication.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
       docReference: "https://flowintel.io/rules/IDP-007",
       detect(ast: ParsedWorkflow): Finding[] {
         const NOTIF = new Set(["n8n-nodes-base.slack","n8n-nodes-base.discord","n8n-nodes-base.telegram","n8n-nodes-base.mattermost"]);
@@ -190,7 +190,7 @@ export const IDEMPOTENCY_EXT: RulePackManifest = {
       category: "IDEMPOTENCY",
       severity: "MEDIUM",
       description: "Scheduled workflow fetches and processes data without tracking what was last processed.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
       docReference: "https://flowintel.io/rules/IDP-009",
       detect(ast: ParsedWorkflow): Finding[] {
         const hasSchedule = ast.nodes.some((n) => n.type === "n8n-nodes-base.scheduleTrigger");
@@ -405,7 +405,7 @@ export const IDEMPOTENCY_EXT: RulePackManifest = {
       category: "IDEMPOTENCY",
       severity: "MEDIUM",
       description: "Workflow implements a state machine but transitions are not idempotent (applying twice changes state).",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
       docReference: "https://flowintel.io/rules/IDP-016",
       detect(ast: ParsedWorkflow): Finding[] {
         const hasStateMachine = ast.nodes.some((n) => {

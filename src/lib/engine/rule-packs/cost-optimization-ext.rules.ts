@@ -6,8 +6,20 @@ import type { Finding, ParsedWorkflow, RulePackManifest } from "../types";
 function fid(r: string, n: string) { return `${r}-${n}`; }
 function ps(node: { parameters?: unknown }): string { return JSON.stringify(node.parameters ?? {}); }
 
-const EXPENSIVE_MODELS = new Set(["gpt-4","gpt-4-turbo","gpt-4o","claude-3-opus","claude-opus","gemini-ultra"]);
-const CHEAP_MODELS = new Set(["gpt-4o-mini","gpt-3.5-turbo","claude-3-haiku","claude-haiku","gemini-flash","mistral-7b"]);
+const EXPENSIVE_MODELS = new Set([
+  "gpt-4", "gpt-4-turbo", "gpt-4o", "gpt-4.1",
+  "claude-3-opus", "claude-opus", "claude-3-5-sonnet", "claude-3-7-sonnet", "claude-4-sonnet",
+  "gemini-ultra", "gemini-1.5-pro", "gemini-2.0-pro", "gemini-2.5-pro",
+  "o1", "o1-preview", "o1-pro", "o3", "o3-mini",
+]);
+const CHEAP_MODELS = new Set([
+  "gpt-4o-mini", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-3.5-turbo",
+  "claude-3-haiku", "claude-haiku", "claude-3-5-haiku",
+  "gemini-flash", "gemini-1.5-flash", "gemini-2.0-flash", "gemini-2.5-flash",
+  "deepseek-chat", "deepseek-v3", "deepseek-r1",
+  "llama-3.1-8b", "llama-3.2-3b", "llama-4-scout",
+  "mistral-7b", "mistral-nemo", "mistral-small",
+]);
 
 export const COST_OPTIMIZATION_EXT: RulePackManifest = {
   id: "flowintel-cost-optimization-ext",

@@ -12,6 +12,7 @@ import { AirflowParser } from "./airflow.parser";
 import { PrefectParser } from "./prefect.parser";
 import { NodeRedParser } from "./node-red.parser";
 import { ActivepiecesParser } from "./activepieces.parser";
+import { PowerAutomateParser } from "./power-automate.parser";
 import { N8nParser } from "./n8n.parser";
 import { GenericParser } from "./generic.parser";
 
@@ -27,6 +28,7 @@ export const PARSERS: IWorkflowParser[] = [
   new PipedreamParser(),     // Pipedream (steps[] with namespace/configured_props/triggers)
   new LangflowParser(),      // LangFlow (data.node.template, ReactFlow component graph)
   new FlowiseParser(),       // Flowise (data.name, baseClasses, Flowise ReactFlow)
+  new PowerAutomateParser(), // Power Automate / Logic Apps (definition.triggers/actions, runAfter)
   new MakeParser(),          // Make (flow[] present, no nodes[])
   new ZapierParser(),        // Zapier (steps[] or node-map)
   new AirflowParser(),       // Airflow (dag_id + tasks[])
@@ -63,9 +65,13 @@ export function detectPlatform(json: unknown): Platform {
       p === "AUTOGEN" ||
       p === "PIPEDREAM" ||
       p === "OPENAI_AGENTS" ||
-      p === "SWARM"
+      p === "SWARM" ||
+      p === "POWER_AUTOMATE" ||
+      p === "LOGIC_APPS"
     ) {
-      return p === "SWARM" ? "OPENAI_AGENTS" : (p as Platform);
+      if (p === "SWARM") return "OPENAI_AGENTS";
+      if (p === "LOGIC_APPS") return "POWER_AUTOMATE";
+      return p as Platform;
     }
   }
 
@@ -78,6 +84,7 @@ export function detectPlatform(json: unknown): Platform {
       if (parser instanceof PipedreamParser) return "PIPEDREAM";
       if (parser instanceof LangflowParser) return "LANGFLOW";
       if (parser instanceof FlowiseParser) return "FLOWISE";
+      if (parser instanceof PowerAutomateParser) return "POWER_AUTOMATE";
       if (parser instanceof MakeParser) return "MAKE";
       if (parser instanceof ZapierParser) return "ZAPIER";
       if (parser instanceof AirflowParser) return "AIRFLOW";
@@ -113,7 +120,7 @@ export function parseWorkflow(json: unknown): ParsedWorkflow {
   throw new Error(
     "Unsupported workflow format. Supported platforms: n8n, Make (Integromat), Zapier, " +
     "Flowise, LangFlow, Dify, CrewAI, AutoGen, Pipedream, OpenAI Agents / Swarm, " +
-    "Apache Airflow, Prefect, Node-RED, Activepieces, or any DAG JSON."
+    "Apache Airflow, Prefect, Node-RED, Activepieces, Power Automate, or any DAG JSON."
   );
 }
 
@@ -132,5 +139,6 @@ export {
   AutoGenParser,
   PipedreamParser,
   OpenAiAgentsParser,
+  PowerAutomateParser,
   GenericParser,
 };

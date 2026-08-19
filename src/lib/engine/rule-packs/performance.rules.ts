@@ -47,7 +47,7 @@ export const PERFORMANCE_PACK: RulePackManifest = {
       description: "Two or more independent HTTP/API calls connected in sequence could be parallelized.",
       enabled: true,
       marketplaceBlocking: false,
-      penaltyPoints: 5,
+      penaltyPoints: 6,
       docReference: "https://flowintel.io/rules/PER-001",
       detect(ast: ParsedWorkflow): Finding[] {
         // Look for two or more HTTP nodes where one directly follows another
@@ -178,7 +178,7 @@ export const PERFORMANCE_PACK: RulePackManifest = {
               suggestedFix: `Evaluate whether GPT-4o-mini or Claude Haiku would be sufficient for the task in "${node.name}".`,
               marketplaceBlocking: false,
               docReference: "https://flowintel.io/rules/PER-003",
-              penaltyPoints: 5,
+              penaltyPoints: 0,
             });
           }
         }

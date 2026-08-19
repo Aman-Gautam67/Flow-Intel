@@ -1,16 +1,16 @@
 /**
- * FlowIntel Compatibility Extension B — CMP-017 to CMP-030
+ * FlowIntel Compatibility Extension B — CMP-017 to CMP-041
  */
 import type { Finding, ParsedWorkflow, RulePackManifest } from "../types";
 
-function fid(r: string, n: string) { return `${r}-${n}`; }
+function fid(r: string, n: string, sfx?: string) { return [r, n, sfx].filter(Boolean).join("-"); }
 function ps(node: { parameters?: unknown }): string { return JSON.stringify(node.parameters ?? {}); }
 
 export const COMPATIBILITY_EXT_B: RulePackManifest = {
   id: "flowintel-compatibility-ext-b",
   name: "FlowIntel Compatibility Extension B",
   version: "2.0.0",
-  description: "CMP-017 through CMP-030: webhook URL changes, credential schema drift, platform migration.",
+  description: "CMP-017 through CMP-041: webhook URL changes, credential schema drift, platform migration, and multi-platform compatibility.",
   rules: [
     {
       id: "CMP-017",
@@ -215,7 +215,7 @@ export const COMPATIBILITY_EXT_B: RulePackManifest = {
       category: "COMPATIBILITY",
       severity: "MEDIUM",
       description: "Stripe API calls use a pinned API version older than 2 years.",
-      enabled: true, marketplaceBlocking: false, penaltyPoints: 10,
+      enabled: true, marketplaceBlocking: false, penaltyPoints: 12,
       docReference: "https://flowintel.io/rules/CMP-023",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
@@ -443,6 +443,558 @@ export const COMPATIBILITY_EXT_B: RulePackManifest = {
           suggestedFix: "Re-export the workflow from a current n8n instance to update the schema version.",
           marketplaceBlocking: false, docReference: "https://flowintel.io/rules/CMP-030", penaltyPoints: 10,
         }];
+      },
+    },
+
+    {
+      id: "CMP-031",
+      name: "Power Automate — Office 365 Outlook REST v2 Deprecated Connector",
+      category: "COMPATIBILITY",
+      severity: "HIGH",
+      description: "Power Automate workflow uses deprecated Office 365 Outlook REST API v2 endpoints (outlook.office.com/api/v2.0), which have been decommissioned.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 15,
+      docReference: "https://flowintel.io/rules/CMP-031",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            const url = String(node.httpMeta?.url ?? "");
+            if (!s.includes("outlook.") && !url.includes("outlook.")) continue;
+
+            if (s.includes("outlook.office.com/api/v2.0") || s.includes("outlook.office365.com/api/v2.0") || url.includes("outlook.office.com/api/v2.0")) {
+              findings.push({
+                id: fid("CMP-031", node.id),
+                ruleId: "CMP-031",
+                ruleName: "Power Automate — Office 365 Outlook REST v2 Deprecated Connector",
+                severity: "HIGH",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Deprecated Outlook REST API v2 endpoint used",
+                  detail: `"${node.name}" calls decommissioned Outlook REST v2 API (outlook.office.com/api/v2.0).`,
+                },
+                humanExplanation: "Microsoft decommissioned the Outlook REST API v2. Workflows calling this endpoint receive HTTP 410 Gone or authentication errors.",
+                suggestedFix: "Migrate to Microsoft Graph API (graph.microsoft.com/v1.0/me/messages) or use the modern Office 365 Outlook connector.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-031",
+                penaltyPoints: 15,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-032",
+      name: "Power Automate — Hardcoded Connection Instead of Connection Reference",
+      category: "COMPATIBILITY",
+      severity: "MEDIUM",
+      description: "Power Automate action references a hardcoded environment connection (/subscriptions/.../connections/) instead of a solution Connection Reference, breaking ALM.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 10,
+      docReference: "https://flowintel.io/rules/CMP-032",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            if (!s.includes("/subscriptions/") && !s.includes("/providers/Microsoft.")) continue;
+
+            if (/\/subscriptions\/[a-f0-9-]+\/.*\/connections\//i.test(s) ||
+                /\/providers\/Microsoft\.PowerApps\/apis\/.*\/connections\//i.test(s) ||
+                /\/subscriptions\/[^\/]+\/resourceGroups\/[^\/]+\/providers\/Microsoft\.Web\/connections\//i.test(s)) {
+              findings.push({
+                id: fid("CMP-032", node.id),
+                ruleId: "CMP-032",
+                ruleName: "Power Automate — Hardcoded Connection Instead of Connection Reference",
+                severity: "MEDIUM",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Hardcoded connection ID detected in Power Automate action",
+                  detail: `"${node.name}" binds directly to a subscription-specific connection ID instead of using a Connection Reference parameter.`,
+                },
+                humanExplanation: "Hardcoded connection IDs bind workflows to a specific Power Automate environment. Exporting and deploying across dev/test/prod environments will fail.",
+                suggestedFix: "Convert the connection to a solution Connection Reference in Power Automate before exporting the flow.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-032",
+                penaltyPoints: 10,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-033",
+      name: "LangFlow — Deprecated LangChain Component",
+      category: "COMPATIBILITY",
+      severity: "HIGH",
+      description: "LangFlow workflow uses deprecated legacy LangChain chain components (RetrievalQAChain, LLMChain, ConversationChain) removed in modern LangChain versions.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 15,
+      docReference: "https://flowintel.io/rules/CMP-033",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const DEPRECATED_CHAINS = ["RetrievalQAChain", "LLMChain", "ConversationChain", "StuffDocumentsChain", "MapReduceDocumentsChain"];
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            const t = node.type;
+            const matched = DEPRECATED_CHAINS.find((chain) =>
+              t.toLowerCase().includes(chain.toLowerCase()) ||
+              node.name.toLowerCase().includes(chain.toLowerCase()) ||
+              s.includes(chain)
+            );
+
+            if (matched) {
+              findings.push({
+                id: fid("CMP-033", node.id),
+                ruleId: "CMP-033",
+                ruleName: "LangFlow — Deprecated LangChain Component",
+                severity: "HIGH",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: `Deprecated LangChain component used: ${matched}`,
+                  detail: `"${node.name}" uses deprecated component "${matched}". Modern LangChain and LangFlow 1.0+ replace legacy chains with LCEL / Agent components.`,
+                },
+                humanExplanation: "Legacy LangChain Chains (RetrievalQAChain, LLMChain, ConversationChain) are deprecated in LangChain 0.2+ and removed in LangChain 0.3+ / modern LangFlow.",
+                suggestedFix: "Migrate from legacy Chains to LangChain Expression Language (LCEL) or modern LangFlow 1.0 Agent/Tool components.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-033",
+                penaltyPoints: 15,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-034",
+      name: "Dify — Dangling Context Variable Reference",
+      category: "COMPATIBILITY",
+      severity: "HIGH",
+      description: "Dify workflow references a context variable ({{#node_id.var#}}) pointing to a node ID that does not exist in the workflow graph.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 18,
+      docReference: "https://flowintel.io/rules/CMP-034",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const validNodeIds = new Set(ast.nodes.map((n) => n.id));
+          const BUILTIN_NAMESPACES = new Set(["sys", "env", "conversation", "input", "context", "start", "workflow"]);
+
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            if (!s.includes("{{#")) continue;
+
+            const varRegex = /\{\{#([a-zA-Z0-9_\-]+)(?:\.([a-zA-Z0-9_\-]+))?#\}\}/g;
+            let match: RegExpExecArray | null;
+            while ((match = varRegex.exec(s)) !== null) {
+              const targetNodeId = match[1]!;
+              if (!BUILTIN_NAMESPACES.has(targetNodeId.toLowerCase()) && !validNodeIds.has(targetNodeId)) {
+                findings.push({
+                  id: fid("CMP-034", node.id, targetNodeId),
+                  ruleId: "CMP-034",
+                  ruleName: "Dify — Dangling Context Variable Reference",
+                  severity: "HIGH",
+                  category: "COMPATIBILITY",
+                  location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                  evidence: {
+                    summary: `Dangling variable reference to nonexistent node ID: {{#${targetNodeId}#}}`,
+                    detail: `"${node.name}" references output variable "{{#${targetNodeId}.${match[2] ?? ""}#}}" from node ID "${targetNodeId}", which does not exist in the workflow graph.`,
+                  },
+                  humanExplanation: "Referencing deleted or nonexistent node IDs in Dify context variables causes runtime execution failures and undefined variable exceptions.",
+                  suggestedFix: `Update variable selector in "${node.name}" to reference a valid upstream node ID in the graph.`,
+                  marketplaceBlocking: false,
+                  docReference: "https://flowintel.io/rules/CMP-034",
+                  penaltyPoints: 18,
+                });
+              }
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-035",
+      name: "CrewAI — Missing expected_output in Task",
+      category: "COMPATIBILITY",
+      severity: "HIGH",
+      description: "CrewAI task definition lacks an expected_output specification, leading to unpredictable agent termination and hallucinated outputs.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 15,
+      docReference: "https://flowintel.io/rules/CMP-035",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const isCrewTask =
+              node.type.startsWith("crewai.task") ||
+              node.type === "crewai.task" ||
+              (ast.platform === "CREWAI" && node.id.startsWith("task_"));
+
+            if (!isCrewTask) continue;
+
+            const p = (node.parameters ?? {}) as Record<string, unknown>;
+            const expOut = p.expected_output;
+            const hasExpectedOutput = typeof expOut === "string" && expOut.trim().length > 0;
+
+            if (!hasExpectedOutput) {
+              findings.push({
+                id: fid("CMP-035", node.id),
+                ruleId: "CMP-035",
+                ruleName: "CrewAI — Missing expected_output in Task",
+                severity: "HIGH",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "CrewAI task lacks expected_output parameter",
+                  detail: `Task "${node.name}" is defined without an expected_output field. In CrewAI v0.28+, expected_output is mandatory for reliable task completion.`,
+                },
+                humanExplanation: "CrewAI tasks without expected_output cannot accurately evaluate completion criteria, leading to infinite agent loops or incomplete responses.",
+                suggestedFix: `Add a clear 'expected_output' string describing the required deliverable format to task "${node.name}".`,
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-035",
+                penaltyPoints: 15,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-036",
+      name: "CrewAI — Hierarchical Process Missing Manager LLM or Agent",
+      category: "COMPATIBILITY",
+      severity: "CRITICAL",
+      description: "CrewAI crew configured with process: 'hierarchical' does not specify a manager_llm or manager_agent, causing execution to crash at runtime.",
+      enabled: true,
+      marketplaceBlocking: true,
+      penaltyPoints: 20,
+      docReference: "https://flowintel.io/rules/CMP-036",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const meta = (ast.metadata ?? {}) as Record<string, unknown>;
+          const rawJson = (ast.rawJson ?? {}) as Record<string, unknown>;
+          const crewObj = (rawJson.crew ?? rawJson) as Record<string, unknown>;
+
+          const isHierarchical =
+            meta.process === "hierarchical" ||
+            crewObj.process === "hierarchical" ||
+            ast.nodes.some((n) => ps(n).includes('"process":"hierarchical"'));
+
+          if (!isHierarchical) return [];
+
+          const hasManager =
+            meta.manager_llm ||
+            meta.manager_agent ||
+            crewObj.manager_llm ||
+            crewObj.manager_agent ||
+            ast.nodes.some((n) => n.id.includes("manager") || n.type.includes("manager") || ps(n).includes("manager_llm") || ps(n).includes("manager_agent"));
+
+          if (!hasManager) {
+            findings.push({
+              id: fid("CMP-036", "crew-process"),
+              ruleId: "CMP-036",
+              ruleName: "CrewAI — Hierarchical Process Missing Manager LLM or Agent",
+              severity: "CRITICAL",
+              category: "COMPATIBILITY",
+              location: {},
+              evidence: {
+                summary: "Hierarchical process without manager_llm or manager_agent",
+                detail: "Crew is configured with process='hierarchical' but neither manager_llm nor manager_agent is defined.",
+              },
+              humanExplanation: "In CrewAI, hierarchical process requires a manager LLM or custom manager agent to orchestrate task delegation. Without one, execution fails immediately.",
+              suggestedFix: "Set `manager_llm: 'gpt-4o'` or specify a `manager_agent` in your Crew definition.",
+              marketplaceBlocking: true,
+              docReference: "https://flowintel.io/rules/CMP-036",
+              penaltyPoints: 20,
+            });
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-037",
+      name: "AutoGen — Legacy 0.2 Config Incompatible with 0.4+",
+      category: "COMPATIBILITY",
+      severity: "HIGH",
+      description: "AutoGen configuration uses legacy 0.2 syntax (UserProxyAgent/AssistantAgent with use_docker, llm_config.config_list) incompatible with AutoGen 0.4+ architecture.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 15,
+      docReference: "https://flowintel.io/rules/CMP-037",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const isAutoGen = ast.platform === "AUTOGEN" || ast.nodes.some((n) => n.type.startsWith("autogen."));
+          if (!isAutoGen) return [];
+
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            const hasLegacyConfig =
+              /use_docker|config_list|human_input_mode|max_consecutive_auto_reply/i.test(s);
+
+            if (hasLegacyConfig) {
+              findings.push({
+                id: fid("CMP-037", node.id),
+                ruleId: "CMP-037",
+                ruleName: "AutoGen — Legacy 0.2 Config Incompatible with 0.4+",
+                severity: "HIGH",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Legacy AutoGen 0.2 configuration pattern detected",
+                  detail: `"${node.name}" uses AutoGen 0.2 syntax (use_docker, config_list, or human_input_mode) which is incompatible with the rebuilt AutoGen 0.4+ asynchronous architecture.`,
+                },
+                humanExplanation: "AutoGen 0.4 completely redesigned the framework around asynchronous message agents and event-driven architecture, deprecating 0.2 config_list structures.",
+                suggestedFix: "Migrate AutoGen configuration to 0.4+ syntax using autogen_agentchat and modern ModelClient definitions.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-037",
+                penaltyPoints: 15,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-038",
+      name: "Pipedream — Legacy Step Missing defineComponent",
+      category: "COMPATIBILITY",
+      severity: "MEDIUM",
+      description: "Pipedream custom code step does not use the modern defineComponent() wrapper, causing deprecation warnings and missing state features.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 10,
+      docReference: "https://flowintel.io/rules/CMP-038",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const isPipedreamCode =
+              (ast.platform === "PIPEDREAM" || node.type.startsWith("pipedream.step")) &&
+              node.isCode;
+
+            if (!isPipedreamCode) continue;
+
+            const codeSnippet = node.codeMeta?.codeSnippet ?? ps(node);
+            const language = node.codeMeta?.language ?? "javascript";
+
+            if (language === "python") continue;
+
+            if (!codeSnippet.includes("defineComponent")) {
+              findings.push({
+                id: fid("CMP-038", node.id),
+                ruleId: "CMP-038",
+                ruleName: "Pipedream — Legacy Step Missing defineComponent",
+                severity: "MEDIUM",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Pipedream Node.js code step does not use defineComponent()",
+                  detail: `"${node.name}" uses legacy script syntax instead of export default defineComponent({ async run({ steps, $ }) { ... } }).`,
+                },
+                humanExplanation: "Pipedream components require defineComponent() to support props, $.service.db state persistence, and modern lifecycle management.",
+                suggestedFix: "Wrap your code step in export default defineComponent({ async run({ steps, $ }) { ... } }).",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-038",
+                penaltyPoints: 10,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-039",
+      name: "Make — Legacy Integromat Domain Reference",
+      category: "COMPATIBILITY",
+      severity: "HIGH",
+      description: "Make workflow contains references to legacy integromat.com webhook or API URLs, which will be decommissioned.",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 15,
+      docReference: "https://flowintel.io/rules/CMP-039",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            const url = String(node.httpMeta?.url ?? "");
+            if (!s.includes("integromat.com") && !url.includes("integromat.com")) continue;
+
+            if (s.includes("integromat.com") || url.includes("integromat.com")) {
+              findings.push({
+                id: fid("CMP-039", node.id),
+                ruleId: "CMP-039",
+                ruleName: "Make — Legacy Integromat Domain Reference",
+                severity: "HIGH",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Legacy integromat.com domain URL reference detected",
+                  detail: `"${node.name}" references legacy domain integromat.com instead of make.com.`,
+                },
+                humanExplanation: "Celonis/Make is sunsetting legacy integromat.com domains and webhook endpoints. Requests to these domains will fail.",
+                suggestedFix: "Update URLs and webhook endpoints from *.integromat.com to *.make.com.",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-039",
+                penaltyPoints: 15,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-040",
+      name: "Cross-Platform — Deprecated AI Embedding Model",
+      category: "COMPATIBILITY",
+      severity: "CRITICAL",
+      description: "Workflow uses a deprecated or shutdown AI model or embedding model (text-embedding-ada-002, gemini-1.0-pro, mistral-medium), causing execution errors.",
+      enabled: true,
+      marketplaceBlocking: true,
+      penaltyPoints: 25,
+      docReference: "https://flowintel.io/rules/CMP-040",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          const DEPRECATED_MODELS = [
+            "text-embedding-ada-002",
+            "gemini-1.0-pro",
+            "gemini-1.0",
+            "gemini-pro-vision",
+            "mistral-medium",
+          ];
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            const modelMeta = String(node.aiMeta?.model ?? "");
+            if (!s.includes("text-embedding-ada-002") && !s.includes("gemini-1.0") && !s.includes("gemini-pro-vision") && !s.includes("mistral-medium") && !modelMeta.includes("text-embedding-ada-002") && !modelMeta.includes("gemini-1.0") && !modelMeta.includes("gemini-pro-vision") && !modelMeta.includes("mistral-medium")) continue;
+
+            const matched = DEPRECATED_MODELS.find((m) =>
+              modelMeta.toLowerCase() === m.toLowerCase() ||
+              s.toLowerCase().includes(`"${m.toLowerCase()}"`) ||
+              s.toLowerCase().includes(`'${m.toLowerCase()}'`) ||
+              s.toLowerCase().includes(`:${m.toLowerCase()}`) ||
+              s.toLowerCase().includes(`/${m.toLowerCase()}`)
+            );
+
+            if (matched) {
+              findings.push({
+                id: fid("CMP-040", node.id),
+                ruleId: "CMP-040",
+                ruleName: "Cross-Platform — Deprecated AI Embedding Model",
+                severity: "CRITICAL",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: `Deprecated AI model configured: ${matched}`,
+                  detail: `"${node.name}" uses deprecated model "${matched}" which has been superseded or retired by the provider.`,
+                },
+                humanExplanation: "AI providers deprecate and shut down older models on announced timelines. Workflows using retired models will fail with API 404/400 errors.",
+                suggestedFix: `Upgrade model "${matched}" to modern alternatives: text-embedding-3-small/large (for OpenAI embeddings), gemini-1.5-pro/flash (for Google), or mistral-large (for Mistral).`,
+                marketplaceBlocking: true,
+                docReference: "https://flowintel.io/rules/CMP-040",
+                penaltyPoints: 25,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
+      },
+    },
+
+    {
+      id: "CMP-041",
+      name: "n8n — Deprecated $items() Expression",
+      category: "COMPATIBILITY",
+      severity: "MEDIUM",
+      description: "n8n workflow uses deprecated $items() expression syntax instead of modern $('NodeName').all() or $input.all().",
+      enabled: true,
+      marketplaceBlocking: false,
+      penaltyPoints: 10,
+      docReference: "https://flowintel.io/rules/CMP-041",
+      detect(ast: ParsedWorkflow): Finding[] {
+        const findings: Finding[] = [];
+        try {
+          for (const node of ast.nodes) {
+            const s = ps(node);
+            const code = String(node.codeMeta?.codeSnippet ?? "");
+            if (!s.includes("$items(") && !code.includes("$items(")) continue;
+
+            if (/\$items\s*\(/i.test(s) || /\$items\s*\(/i.test(code)) {
+              findings.push({
+                id: fid("CMP-041", node.id),
+                ruleId: "CMP-041",
+                ruleName: "n8n — Deprecated $items() Expression",
+                severity: "MEDIUM",
+                category: "COMPATIBILITY",
+                location: { nodeId: node.id, nodeName: node.name, nodeType: node.type },
+                evidence: {
+                  summary: "Deprecated $items() expression syntax used",
+                  detail: `"${node.name}" uses deprecated $items() syntax to access node execution items.`,
+                },
+                humanExplanation: "$items() was deprecated in n8n v0.198+ in favor of $('NodeName').all() or $input.all(), and is removed in newer n8n runtime environments.",
+                suggestedFix: "Replace $items('NodeName') with $('NodeName').all() or $input.all().",
+                marketplaceBlocking: false,
+                docReference: "https://flowintel.io/rules/CMP-041",
+                penaltyPoints: 10,
+              });
+            }
+          }
+        } catch {
+          // Safe guard against malformed AST
+        }
+        return findings;
       },
     },
   ],

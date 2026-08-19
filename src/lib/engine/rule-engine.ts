@@ -19,6 +19,32 @@ import type { ParsedWorkflow } from "@/types";
 import type { Finding, RuleCategory } from "./types";
 
 /**
+ * Skip sets (performance optimisation) — AGENTS.md §19
+ */
+export const AI_ONLY_RULES = new Set([
+  "SEC-010", "SEC-016", "SEC-039", "SEC-040",
+  "REL-015", "REL-022", "REL-031",
+  "PER-003", "PER-010", "PER-017", "PER-021",
+  "CST-001", "CST-004", "CST-005", "CST-006", "CST-008", "CST-009", "CST-013", "CST-015", "CST-019",
+  "PRV-001", "PRV-008", "PRV-011",
+]);
+
+export const HTTP_ONLY_RULES = new Set([
+  "SEC-003", "SEC-007", "SEC-011", "SEC-012", "SEC-013", "SEC-018", "SEC-024", "SEC-025", "SEC-036", "SEC-038",
+  "REL-001", "REL-003", "REL-004", "REL-006", "REL-017", "REL-018", "REL-026", "REL-027", "REL-030",
+  "PER-001", "PER-004", "PER-005", "PER-006", "PER-009", "PER-013", "PER-019",
+  "CST-002", "CST-003", "CST-007", "CST-011",
+  "CMP-015", "CMP-019", "CMP-020",
+]);
+
+export const CODE_ONLY_RULES = new Set([
+  "SEC-004", "SEC-008", "SEC-009", "SEC-022", "SEC-026", "SEC-033", "SEC-037",
+  "REL-019",
+  "PER-008", "PER-016", "PER-018", "PER-022", "PER-025", "PER-026",
+  "MNT-002", "MNT-007", "MNT-013", "MNT-026",
+]);
+
+/**
  * Execute all enabled rules against the workflow AST.
  *
  * @param ast - Normalized workflow AST from any supported parser
@@ -31,8 +57,13 @@ export function executeRules(
 ): Finding[] {
   const allFindings: Finding[] = [];
   const rules = registry.getEnabledRules();
+  const hasCodeNodes = (ast.codeNodesCount ?? 0) > 0 || ast.nodes.some((n) => n.isCode);
 
   for (const rule of rules) {
+    if (AI_ONLY_RULES.has(rule.id) && (ast.aiNodesCount ?? 0) === 0) continue;
+    if (HTTP_ONLY_RULES.has(rule.id) && (ast.httpNodesCount ?? 0) === 0) continue;
+    if (CODE_ONLY_RULES.has(rule.id) && !hasCodeNodes) continue;
+
     let findings: Finding[] = [];
     try {
       findings = rule.detect(ast);
@@ -81,7 +112,13 @@ export function executeRulesForCategory(
 ): Finding[] {
   const rules = registry.getRulesByCategory(category);
   const findings: Finding[] = [];
+  const hasCodeNodes = (ast.codeNodesCount ?? 0) > 0 || ast.nodes.some((n) => n.isCode);
+
   for (const rule of rules) {
+    if (AI_ONLY_RULES.has(rule.id) && (ast.aiNodesCount ?? 0) === 0) continue;
+    if (HTTP_ONLY_RULES.has(rule.id) && (ast.httpNodesCount ?? 0) === 0) continue;
+    if (CODE_ONLY_RULES.has(rule.id) && !hasCodeNodes) continue;
+
     try {
       findings.push(...rule.detect(ast));
     } catch { /* skip crashed rules */ }

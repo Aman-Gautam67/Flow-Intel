@@ -2,7 +2,8 @@ export type Platform =
   | "N8N" | "MAKE" | "ZAPIER" | "FLOWISE" | "LANGFLOW"
   | "AIRFLOW" | "PREFECT" | "DAGSTER" | "GENERIC"
   | "NODE_RED" | "ACTIVEPIECES"
-  | "DIFY" | "CREWAI" | "AUTOGEN" | "PIPEDREAM" | "OPENAI_AGENTS";
+  | "DIFY" | "CREWAI" | "AUTOGEN" | "PIPEDREAM" | "OPENAI_AGENTS"
+  | "POWER_AUTOMATE";
 
 export type WorkflowPlatform = Platform;
 
