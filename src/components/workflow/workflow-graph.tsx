@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { N8nNode } from "@/types";
+import { buildConnectionGraph } from "@/lib/engine/graph";
+import { DeepContextResolver } from "@/lib/engine/deep-context";
 
 interface WorkflowGraphProps {
   nodes: N8nNode[];
@@ -180,45 +182,76 @@ export function WorkflowGraph({
         })}
 
         {/* Nodes */}
-        {nodes.map((node) => {
-          const pos = positions.get(node.name);
-          if (!pos) return null;
-          const color = getNodeColor(node.type);
-          const label = getNodeLabel(node);
-          const isSelected = node.name === selectedNodeName;
-          const isDisabled = node.disabled;
+        {(() => {
+          const graphMap = buildConnectionGraph(connections, nodes as any);
+          const ctx = DeepContextResolver.resolve({ nodes });
 
-          return (
-            <g
-              key={node.id}
-              transform={`translate(${pos.x}, ${pos.y})`}
-              opacity={isDisabled ? 0.35 : 1}
-              onClick={() => onNodeClick?.(node)}
-              style={{ cursor: onNodeClick ? "pointer" : "default" }}>
-              {/* Selection halo */}
-              {isSelected && (
+          return nodes.map((node) => {
+            const pos = positions.get(node.name);
+            if (!pos) return null;
+            const color = getNodeColor(node.type);
+            const label = getNodeLabel(node);
+            const isSelected = node.name === selectedNodeName;
+            const isDisabled = node.disabled;
+
+            const metrics = graphMap[node.name] || graphMap[node.id];
+            const isSplitter = metrics?.isFanOutSplitter;
+            const outDegree = metrics?.outDegree ?? 0;
+            const nodeCtx = ctx.getNodeContext(node.id || node.name);
+            const hasAuth = nodeCtx?.hasAuth || Boolean(node.credentials && Object.keys(node.credentials).length > 0);
+
+            return (
+              <g
+                key={node.id}
+                transform={`translate(${pos.x}, ${pos.y})`}
+                opacity={isDisabled ? 0.35 : 1}
+                onClick={() => onNodeClick?.(node)}
+                style={{ cursor: onNodeClick ? "pointer" : "default" }}>
+                {/* Fan-Out Splitter Badge */}
+                {isSplitter && (
+                  <g transform="translate(0, -11)">
+                    <rect x={-2} y={0} width={nodeW + 4} height={9} rx={2} fill="#f7d774" opacity={0.9} />
+                    <text x={nodeW / 2} y={7} textAnchor="middle" fontSize={6} fontWeight="bold" fill="#000" fontFamily="var(--font-mono)">
+                      ⚡ SPLIT {outDegree}x
+                    </text>
+                  </g>
+                )}
+
+                {/* Resolved Auth Badge */}
+                {hasAuth && !isSplitter && (
+                  <g transform="translate(0, -11)">
+                    <rect x={-2} y={0} width={nodeW + 4} height={9} rx={2} fill="#00ff88" opacity={0.9} />
+                    <text x={nodeW / 2} y={7} textAnchor="middle" fontSize={6} fontWeight="bold" fill="#000" fontFamily="var(--font-mono)">
+                      🔒 AUTH
+                    </text>
+                  </g>
+                )}
+
+                {/* Selection halo */}
+                {isSelected && (
+                  <rect
+                    x={-4} y={-4} width={nodeW + 8} height={nodeH + 8} rx={4}
+                    fill="none" stroke={color} strokeWidth={1.5} opacity={0.7}
+                    style={{ filter: `drop-shadow(0 0 6px ${color}99)` }}
+                  />
+                )}
                 <rect
-                  x={-4} y={-4} width={nodeW + 8} height={nodeH + 8} rx={4}
-                  fill="none" stroke={color} strokeWidth={1.5} opacity={0.7}
-                  style={{ filter: `drop-shadow(0 0 6px ${color}99)` }}
+                  x={0} y={0} width={nodeW} height={nodeH} rx={2}
+                  fill={isSelected ? `${color}18` : "rgba(8,8,8,0.88)"}
+                  stroke={isSplitter ? "#f7d774" : color}
+                  strokeWidth={isSelected || isSplitter ? 1.5 : 1}
+                  style={{ filter: `drop-shadow(0 0 ${isSelected ? 8 : 4}px ${color}${isSelected ? "66" : "33"})` }}
                 />
-              )}
-              <rect
-                x={0} y={0} width={nodeW} height={nodeH} rx={2}
-                fill={isSelected ? `${color}18` : "rgba(8,8,8,0.88)"}
-                stroke={color}
-                strokeWidth={isSelected ? 1.5 : 1}
-                style={{ filter: `drop-shadow(0 0 ${isSelected ? 8 : 4}px ${color}${isSelected ? "66" : "33"})` }}
-              />
-              <text
-                x={nodeW / 2} y={nodeH * 0.65}
-                textAnchor="middle" fontSize={7} fill={color}
-                fontFamily="var(--font-mono)">
-                {label}
-              </text>
-            </g>
-          );
-        })}
+                <text
+                  x={nodeW / 2} y={nodeH * 0.65}
+                  textAnchor="middle" fontSize={7} fill={isSplitter ? "#f7d774" : color}
+                  fontFamily="var(--font-mono)">
+                  {label}
+                </text>
+              </g>
+            );
+          });
+        })()}
       </svg>
     </div>
   );

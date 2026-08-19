@@ -180,14 +180,17 @@ const DELAY_NODE_TYPES = new Set([
 ]);
 
 function isAiNode(type: string): boolean {
+  if (!type || typeof type !== "string") return false;
   if (AI_NODE_TYPES.has(type)) return true;
   const lower = type.toLowerCase();
   return AI_NODE_PREFIXES.some((p) => lower.includes(p));
 }
 function isTriggerNode(type: string): boolean {
+  if (!type || typeof type !== "string") return false;
   return type.toLowerCase().includes("trigger") || type === "n8n-nodes-base.webhook" || TRIGGER_TYPES.has(type);
 }
 function classifyNodeVendorType(type: string): "saas"|"community"|"selfhosted"|"core" {
+  if (!type || typeof type !== "string") return "core";
   if (SERVICE_MAP[type]) return SERVICE_MAP[type]!.vendorType;
   if (type.startsWith("@n8n/")) return "saas";
   if (type.startsWith("n8n-nodes-base.")) return "core";
@@ -225,17 +228,18 @@ function buildEdges(connections: Record<string, unknown>): NormalEdge[] {
 }
 
 // ── Map N8nNode → NormalNode ──────────────────────────────────────────────────
-function toNormalNode(node: N8nNode): NormalNode {
-  const params = (node.parameters ?? {}) as Record<string, unknown>;
-  const opts = params.options as Record<string, unknown> | undefined;
-  const aiPkg = isAiNode(node.type);
-  const httpMeta = HTTP_NODE_TYPES.has(node.type) ? {
+function toNormalNode(node: N8nNode, idx: number): NormalNode {
+  const nodeType = String(node.type ?? "unknown");
+  const params = (node.parameters && typeof node.parameters === "object" ? node.parameters : {}) as Record<string, unknown>;
+  const opts = (params.options && typeof params.options === "object") ? (params.options as Record<string, unknown>) : undefined;
+  const aiPkg = isAiNode(nodeType);
+  const httpMeta = HTTP_NODE_TYPES.has(nodeType) ? {
     url: String(params.url ?? params.webhookUrl ?? ""),
     method: ((params.method ?? opts?.method ?? "GET") as string).toUpperCase(),
   } : undefined;
-  const codeMeta = CODE_NODE_TYPES.has(node.type) ? {
+  const codeMeta = CODE_NODE_TYPES.has(nodeType) ? {
     codeSnippet: String(params.jsCode ?? params.code ?? params.functionCode ?? params.pythonCode ?? ""),
-    language: node.type.includes("python") ? "python" as const : "javascript" as const,
+    language: nodeType.includes("python") ? "python" as const : "javascript" as const,
   } : undefined;
   const aiMeta = aiPkg ? {
     maxIterations: (params.maxIterations ?? opts?.maxIterations) as number | undefined,
@@ -243,13 +247,21 @@ function toNormalNode(node: N8nNode): NormalNode {
     model: String(params.model ?? params.modelId ?? params.modelName ?? ""),
   } : undefined;
   return {
-    id: node.id, name: node.name, type: node.type,
-    typeVersion: node.typeVersion, disabled: node.disabled, position: node.position,
-    parameters: params, credentials: (node.credentials ?? {}) as Record<string, unknown>,
-    isTrigger: isTriggerNode(node.type), isHttp: HTTP_NODE_TYPES.has(node.type),
-    isCode: CODE_NODE_TYPES.has(node.type), isAi: aiPkg,
-    isLoop: LOOP_NODE_TYPES.has(node.type), isBranch: BRANCH_NODE_TYPES.has(node.type),
-    isDelay: DELAY_NODE_TYPES.has(node.type),
+    id: String(node.id ?? `node_${idx}`),
+    name: String(node.name ?? node.id ?? `Node ${idx}`),
+    type: nodeType,
+    typeVersion: node.typeVersion,
+    disabled: node.disabled,
+    position: node.position,
+    parameters: params,
+    credentials: (node.credentials && typeof node.credentials === "object" ? node.credentials : {}) as Record<string, unknown>,
+    isTrigger: isTriggerNode(nodeType),
+    isHttp: HTTP_NODE_TYPES.has(nodeType),
+    isCode: CODE_NODE_TYPES.has(nodeType),
+    isAi: aiPkg,
+    isLoop: LOOP_NODE_TYPES.has(nodeType),
+    isBranch: BRANCH_NODE_TYPES.has(nodeType),
+    isDelay: DELAY_NODE_TYPES.has(nodeType),
     isAuthenticated: !!(node.credentials && Object.keys(node.credentials).length > 0),
     httpMeta, codeMeta, aiMeta,
   };
@@ -259,13 +271,13 @@ export class N8nParser implements IWorkflowParser {
   supports(json: unknown): boolean {
     if (!json || typeof json !== "object") return false;
     const obj = json as Record<string, unknown>;
-    return Array.isArray(obj.nodes) || typeof obj.connections === "object";
+    return Array.isArray(obj.nodes) || (obj.connections !== null && typeof obj.connections === "object");
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const wf = json as N8nWorkflowJson;
-    const rawNodes: N8nNode[] = wf.nodes ?? [];
-    const rawConnections = (wf.connections ?? {}) as Record<string, unknown>;
+    const wf = (json && typeof json === "object") ? (json as N8nWorkflowJson) : {};
+    const rawNodes: N8nNode[] = (wf.nodes ?? []).filter((n): n is N8nNode => Boolean(n && typeof n === "object"));
+    const rawConnections = (wf.connections && typeof wf.connections === "object" ? wf.connections : {}) as Record<string, unknown>;
 
     let connectionCount = 0;
     for (const outputs of Object.values(rawConnections)) {

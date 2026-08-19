@@ -1,7 +1,10 @@
 export type Platform =
   | "N8N" | "MAKE" | "ZAPIER" | "FLOWISE" | "LANGFLOW"
   | "AIRFLOW" | "PREFECT" | "DAGSTER" | "GENERIC"
-  | "NODE_RED" | "ACTIVEPIECES";
+  | "NODE_RED" | "ACTIVEPIECES"
+  | "DIFY" | "CREWAI" | "AUTOGEN" | "PIPEDREAM" | "OPENAI_AGENTS";
+
+export type WorkflowPlatform = Platform;
 
 // ─── Severity ────────────────────────────────────────────────────────────────
 export type Severity = "CRITICAL" | "WARNING" | "INFO" | "PASS";
@@ -71,6 +74,11 @@ export interface ParsedWorkflow {
   extractedSecretsCount: number;
   rawNodes: unknown[];   // platform-raw node array; N8nNode[] for N8N, unknown[] for others
   rawConnections: Record<string, unknown>;
+  rawJson?: unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  __deepContext?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  __graph?: any;
 }
 
 export interface IWorkflowParser {

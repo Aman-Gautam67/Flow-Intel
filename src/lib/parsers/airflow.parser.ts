@@ -48,26 +48,27 @@ const AI_OPERATORS = new Set([
 ]);
 
 function toNormalNode(task: AirflowTask, idx: number): NormalNode {
-  const opType = task.task_type ?? task.operator ?? "PythonOperator";
+  const safeTask = (task && typeof task === "object") ? task : ({} as AirflowTask);
+  const opType = String(safeTask.task_type ?? safeTask.operator ?? "PythonOperator");
   const params: Record<string, unknown> = {
-    ...(task.params ?? {}),
-    ...(task.op_kwargs ?? {}),
-    ...(task.op_args ? { op_args: task.op_args } : {}),
+    ...(safeTask.params ?? {}),
+    ...(safeTask.op_kwargs ?? {}),
+    ...(safeTask.op_args ? { op_args: safeTask.op_args } : {}),
   };
   const isCode = CODE_OPERATORS.has(opType);
   const isHttp = HTTP_OPERATORS.has(opType);
   const isAi   = AI_OPERATORS.has(opType);
 
   return {
-    id:          task.task_id ?? `task-${idx}`,
-    name:        task.task_id ?? `Task ${idx}`,
+    id:          String(safeTask.task_id ?? `task-${idx}`),
+    name:        String(safeTask.task_id ?? `Task ${idx}`),
     type:        opType,
     typeVersion: 1,
     disabled:    false,
     position:    [200 + idx * 220, 300],
     parameters:  params,
     credentials: {},
-    isTrigger:   (task.downstream_task_ids?.length === 0 || idx === 0) && opType.toLowerCase().includes("sensor"),
+    isTrigger:   (Array.isArray(safeTask.downstream_task_ids) ? safeTask.downstream_task_ids.length === 0 : idx === 0) && opType.toLowerCase().includes("sensor"),
     isHttp,
     isCode,
     isAi,
@@ -95,21 +96,25 @@ export class AirflowParser implements IWorkflowParser {
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const root = json as AirflowDagRoot;
+    const root = (json && typeof json === "object") ? (json as AirflowDagRoot) : {};
     // Normalise shape B into shape A
-    const dagId    = root.dag_id ?? root.dag?._dag_id ?? "unnamed_dag";
-    const rawTasks: AirflowTask[] = root.tasks ?? root.dag?.tasks ?? [];
+    const dagId    = String(root.dag_id ?? root.dag?._dag_id ?? "unnamed_dag");
+    const rawTasks: AirflowTask[] = (root.tasks ?? root.dag?.tasks ?? []).filter(
+      (t): t is AirflowTask => Boolean(t && typeof t === "object")
+    );
 
     const nodes   = rawTasks.map(toNormalNode);
     const edges: NormalEdge[] = [];
     for (const task of rawTasks) {
       for (const downstream of task.downstream_task_ids ?? []) {
-        edges.push({ source: task.task_id ?? "", target: downstream, type: "main" });
+        if (downstream !== null && downstream !== undefined) {
+          edges.push({ source: String(task.task_id ?? ""), target: String(downstream), type: "main" });
+        }
       }
     }
 
     const extractedParameters = rawTasks.flatMap((t, i) =>
-      flattenParams(t.task_id ?? `task-${i}`, { ...t.params, ...t.op_kwargs })
+      flattenParams(String(t.task_id ?? `task-${i}`), { ...(t.params ?? {}), ...(t.op_kwargs ?? {}) })
     );
 
     return {

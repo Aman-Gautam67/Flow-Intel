@@ -148,6 +148,42 @@ export function InlineReportPanel({ result, slug, filename, onAnalyzeAnother, on
         </div>
       </div>
 
+      {/* Deep Context Chips */}
+      {(() => {
+        const deepCtx = parsed.__deepContext;
+        const graph = parsed.__graph;
+        const splittersCount = graph ? Object.values(graph).filter((n: any) => n.isFanOutSplitter).length : 0;
+        const hasRootReadme = deepCtx?.root?.hasReadme;
+
+        return (
+          <div className="flex items-center gap-3 px-4 py-2 border font-mono text-[10px] uppercase tracking-widest flex-wrap"
+            style={{ borderColor: "var(--color-fi-border)", background: "rgba(10,10,10,0.6)" }}>
+            <span className="text-[var(--color-fi-muted)]">Context Layer:</span>
+            {splittersCount > 0 ? (
+              <span className="px-2 py-0.5 rounded bg-[rgba(247,215,116,0.1)] text-[var(--color-fi-warn)] border border-[rgba(247,215,116,0.2)]">
+                ⚡ {splittersCount} Fan-out Splitter{splittersCount > 1 ? "s" : ""}
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded bg-[rgba(255,255,255,0.04)] text-[var(--color-fi-muted)]">
+                Topology Linear
+              </span>
+            )}
+            {hasRootReadme ? (
+              <span className="px-2 py-0.5 rounded bg-[rgba(0,255,136,0.1)] text-[var(--color-fi-accent)] border border-[rgba(0,255,136,0.2)]">
+                ✓ Root README Detected
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded bg-[rgba(255,93,93,0.1)] text-[var(--color-fi-crit)] border border-[rgba(255,93,93,0.2)]">
+                ! No Root README
+              </span>
+            )}
+            <span className="px-2 py-0.5 rounded bg-[rgba(134,167,255,0.1)] text-[var(--color-fi-info)] border border-[rgba(134,167,255,0.2)]">
+              Deep Options Scan Active
+            </span>
+          </div>
+        );
+      })()}
+
       {/* Score rings + FQI */}
       <div className="border" style={{ borderColor: "var(--color-fi-border)", background: "rgba(8,8,8,0.72)" }}>
         <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>

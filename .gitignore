@@ -21,6 +21,8 @@
 /node_modules
 /.pnp
 .pnp.js
+.agents/
+PROJECT.md
 
 # testing
 /coverage

@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error Bun test type definitions
 import { describe, expect, test } from "bun:test";
 import { parseWorkflow } from "../index";
 

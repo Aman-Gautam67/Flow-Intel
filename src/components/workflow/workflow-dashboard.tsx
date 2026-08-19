@@ -23,6 +23,7 @@ import {
 import { EngagementStrip } from "./engagement-strip";
 import { DriftPanel } from "./drift-panel";
 import { detectDrift, sortDrift } from "@/lib/engine/drift-database";
+import { ContextIntelligencePanel } from "./context-intelligence-panel";
 
 interface DashboardProps {
   slug: string;
@@ -360,6 +361,13 @@ export function WorkflowDashboard({
           initialViews={views}
           initialDownloads={downloads}
           initialBookmarks={bookmarks}
+        />
+
+        {/* Pre-Processing Context Intelligence Panel */}
+        <ContextIntelligencePanel
+          rawNodes={rawNodes}
+          rawConnections={rawConnections}
+          metadata={description ? { description } : undefined}
         />
 
         {/* Tabs */}

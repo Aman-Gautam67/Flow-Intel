@@ -5,17 +5,17 @@ export class NodeRedParser implements IWorkflowParser {
   supports(json: unknown): boolean {
     if (!Array.isArray(json)) return false;
     // Node-RED is an array of nodes, each needs an id, type, wires
-    return json.some((n: any) => n && typeof n === "object" && typeof n.id === "string" && typeof n.type === "string" && Array.isArray(n.wires));
+    return json.some((n: unknown) => Boolean(n && typeof n === "object" && typeof (n as Record<string, unknown>).id === "string" && typeof (n as Record<string, unknown>).type === "string" && Array.isArray((n as Record<string, unknown>).wires)));
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const rawNodes = json as any[];
+    const rawNodes = Array.isArray(json) ? json : [];
     
     const nodes: NormalNode[] = [];
     const edges: NormalEdge[] = [];
-    let extractedParameters: any[] = [];
-    const triggerNodes: any[] = [];
-    const integrations: any[] = [];
+    const extractedParameters: ReturnType<typeof flattenParams> = [];
+    const triggerNodes: ParsedWorkflow["triggerNodes"] = [];
+    const integrations: ParsedWorkflow["integrations"] = [];
     
     let aiNodesCount = 0;
     let httpNodesCount = 0;

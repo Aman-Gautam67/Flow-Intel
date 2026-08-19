@@ -19,7 +19,8 @@
     "db:drop": "drizzle-kit drop",
     "test:score": "bun src/lib/engine/__tests__/scoring-simulation.ts",
     "test:detect": "bun src/lib/engine/__tests__/detect-bad-workflow.ts",
-    "test:ai": "bun src/lib/engine/__tests__/ai-guardrails.test.ts"
+    "test:ai": "bun src/lib/engine/__tests__/ai-guardrails.test.ts",
+    "test:context": "bun src/lib/engine/__tests__/context-aware-upgrade.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",

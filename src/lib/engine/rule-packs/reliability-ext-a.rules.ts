@@ -110,8 +110,11 @@ export const RELIABILITY_EXT_A: RulePackManifest = {
       docReference: "https://flowintel.io/rules/REL-008",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
+        const graph = (ast as any).__graph;
         for (const node of ast.nodes) {
-          const outCount = ast.edges.filter((e) => e.source === node.name).length;
+          const legacyOutCount = ast.edges.filter((e) => e.source === node.name || e.source === node.id).length;
+          const graphNode = graph ? (graph[node.name] || graph[node.id]) : null;
+          const outCount = graphNode ? graphNode.outDegree : legacyOutCount;
           if (outCount >= 5) {
             findings.push({
               id: fid("REL-008", node.id),

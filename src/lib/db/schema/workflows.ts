@@ -19,6 +19,7 @@ export const platformEnum = pgEnum("platform", [
   "N8N", "MAKE", "ZAPIER", "FLOWISE", "LANGFLOW",
   "AIRFLOW", "PREFECT", "DAGSTER", "GENERIC",
   "NODE_RED", "ACTIVEPIECES",
+  "DIFY", "CREWAI", "AUTOGEN", "PIPEDREAM", "OPENAI_AGENTS",
 ]);
 
 // ─── Workflows ────────────────────────────────────────────────────────────────

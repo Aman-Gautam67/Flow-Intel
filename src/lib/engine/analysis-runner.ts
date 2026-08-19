@@ -43,8 +43,25 @@ import { createPassport, generateWorkflowId } from "./passport";
 import { estimateCost } from "@/lib/analyzer/cost-estimator";
 import { edgesToConnectionMap } from "@/lib/parsers/normalise";
 
+import { DeepContextResolver } from "./deep-context";
+import { buildConnectionGraph } from "./graph";
+
 // Bootstrap: register all built-in rule packs once at module load
 registerAllPacks();
+
+function ensureContext(ast: ParsedWorkflow) {
+  if (process.env.DISABLE_DEEP_CONTEXT === "true") return;
+  try {
+    if (!ast.__deepContext) {
+      ast.__deepContext = DeepContextResolver.resolve(ast.rawJson ?? ast, ast);
+    }
+    if (!ast.__graph) {
+      ast.__graph = buildConnectionGraph(ast.rawConnections, ast.nodes, ast.edges);
+    }
+  } catch (err) {
+    console.warn("[AnalysisRunner] Pre-processing context resolution error:", err);
+  }
+}
 
 /**
  * Run the complete FlowIntel v2 analysis pipeline.
@@ -62,6 +79,9 @@ export async function runAnalysis(
     previousPassport?: import("./types").WorkflowPassport;
   }
 ): Promise<AnalysisReport> {
+  // ── 0. Pre-processing Context Layer ──────────────────────────────────────
+  ensureContext(ast);
+
   // ── 1. Fingerprint ─────────────────────────────────────────────────────────
   const fingerprint = await fingerprintWorkflow(ast);
 
@@ -146,6 +166,7 @@ export function runAnalysisSync(ast: ParsedWorkflow): Omit<AnalysisReport, "fing
   certificate: null;
   passport: null;
 } {
+  ensureContext(ast);
   const findings = executeRules(ast, registry);
 
   const workflowContext = {

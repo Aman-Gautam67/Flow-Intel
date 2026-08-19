@@ -161,8 +161,8 @@ function flowNodeToNormal(node: FlowNode): NormalNode {
   if (inputs.pineconeApiKey) credentials.pineconeApi = { id: "input" };
 
   return {
-    id: node.id,
-    name: label as string,
+    id: String(node.id ?? "node"),
+    name: String(label ?? "node"),
     type: `flowise.${nodeType}`,
     disabled: false,
     position: node.position ? [node.position.x, node.position.y] : undefined,
@@ -201,26 +201,41 @@ export class FlowiseParser implements IWorkflowParser {
     const obj = json as Record<string, unknown>;
     // Accept explicit FLOWISE tag
     if (obj.platform === "FLOWISE" || obj.platform === "flowise") return true;
-    // Accept LangFlow structure (data.nodes or top-level nodes with ReactFlow shape)
-    const topNodes = Array.isArray(obj.nodes) ? obj.nodes as FlowNode[] : null;
+    // Accept Flowise/LangFlow structure (data.nodes or top-level nodes with ReactFlow shape)
+    const topNodes = Array.isArray(obj.nodes) ? obj.nodes : null;
     const dataNodes = obj.data && typeof obj.data === "object"
-      ? (obj.data as Record<string, unknown>).nodes as FlowNode[] | null
+      ? (obj.data as Record<string, unknown>).nodes
       : null;
-    const nodes = topNodes ?? dataNodes;
-    if (!nodes || nodes.length === 0) return false;
-    // n8n has `type` as a string property directly; Flowise nodes have `data.name` or `data.type`
-    const firstNode = nodes[0] as FlowNode;
-    const isFlowiseShape = firstNode.data !== undefined;
-    const hasN8nConnections = !!(obj as Record<string,unknown>).connections;
-    const hasMakeFlow = Array.isArray((obj as Record<string,unknown>).flow);
+    const rawNodes = (topNodes ?? dataNodes);
+    if (!Array.isArray(rawNodes) || rawNodes.length === 0) return false;
+
+    const isRecord = (v: unknown): v is Record<string, unknown> => Boolean(v && typeof v === "object" && !Array.isArray(v));
+
+    // n8n has `type` as a string property directly; Flowise nodes have `data.category`, `data.baseClasses`, `data.label`, `data.inputs`, or `data.name`/`data.type`
+    const isFlowiseShape = (rawNodes as unknown[]).some(
+      (n: any) => isRecord(n) && isRecord(n.data) && (
+        typeof n.data.category === "string" ||
+        Array.isArray(n.data.baseClasses) ||
+        typeof n.data.label === "string" ||
+        isRecord(n.data.inputs) ||
+        typeof n.data.name === "string" ||
+        typeof n.data.type === "string"
+      )
+    );
+    const hasN8nConnections = !!(obj as Record<string, unknown>).connections;
+    const hasMakeFlow = Array.isArray((obj as Record<string, unknown>).flow);
     return isFlowiseShape && !hasN8nConnections && !hasMakeFlow;
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const doc = json as FlowExport;
+    const doc = (json && typeof json === "object") ? (json as FlowExport) : {};
     // Support both top-level and LangFlow's `data` wrapper
-    const rawNodes: FlowNode[] = doc.nodes ?? doc.data?.nodes ?? [];
-    const rawEdges: FlowEdge[] = doc.edges ?? doc.data?.edges ?? [];
+    const rawNodes: FlowNode[] = (doc.nodes ?? doc.data?.nodes ?? []).filter(
+      (n): n is FlowNode => Boolean(n && typeof n === "object")
+    );
+    const rawEdges: FlowEdge[] = (doc.edges ?? doc.data?.edges ?? []).filter(
+      (e): e is FlowEdge => Boolean(e && typeof e === "object")
+    );
 
     const nodes: NormalNode[] = rawNodes.map(flowNodeToNormal);
     const edges: NormalEdge[] = rawEdges.map((e) => ({

@@ -83,10 +83,11 @@ interface ZapierExport {
 }
 
 function stepToNormal(step: ZapierStep, index: number): NormalNode {
-  const app = step.app ?? step.selected_api ?? "unknown";
+  const safeStep = (step && typeof step === "object") ? step : ({} as ZapierStep);
+  const app = String(safeStep.app ?? safeStep.selected_api ?? "unknown");
   const appLower = app.toLowerCase();
-  const typeOf = step.type_of ?? "";
-  const params = step.params ?? {};
+  const typeOf = String(safeStep.type_of ?? "");
+  const params = (safeStep.params && typeof safeStep.params === "object") ? safeStep.params : {};
   const isAi = ZAPIER_AI_APPS.has(appLower) || appLower.includes("openai") || appLower.includes("anthropic") || appLower.includes("ai");
   const isHttp = appLower.includes("webhook") || appLower.includes("http");
   const isCode = appLower === "code-by-zapier" || appLower.includes("code");
@@ -106,9 +107,9 @@ function stepToNormal(step: ZapierStep, index: number): NormalNode {
   } : undefined;
 
   return {
-    id: String(step.id ?? index),
-    name: `${app}: ${step.action ?? typeOf ?? "step"} (${step.id ?? index})`,
-    type: `zapier.${appLower}.${step.action ?? typeOf ?? "step"}`,
+    id: String(safeStep.id ?? index),
+    name: `${app}: ${safeStep.action ?? typeOf ?? "step"} (${safeStep.id ?? index})`,
+    type: `zapier.${appLower}.${safeStep.action ?? typeOf ?? "step"}`,
     disabled: false,
     parameters: params,
     credentials: {},
@@ -119,8 +120,9 @@ function stepToNormal(step: ZapierStep, index: number): NormalNode {
 }
 
 function nodeMapEntryToNormal(id: string, entry: ZapierNodeMap[string], index: number): NormalNode {
+  const safeEntry = (entry && typeof entry === "object") ? entry : {};
   const fakeStep: ZapierStep = {
-    id, type_of: entry.type, app: entry.app, action: entry.action, params: entry.params,
+    id, type_of: safeEntry.type, app: safeEntry.app, action: safeEntry.action, params: safeEntry.params,
   };
   return stepToNormal(fakeStep, index);
 }
@@ -141,30 +143,37 @@ export class ZapierParser implements IWorkflowParser {
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const doc = json as ZapierExport;
+    const doc = (json && typeof json === "object") ? (json as ZapierExport) : {};
     let nodes: NormalNode[] = [];
     let edges: NormalEdge[] = [];
     let extractedParameters: ExtractedParam[] = [];
 
     if (Array.isArray(doc.steps)) {
       // ── Step-array form ──────────────────────────────────────────────────
-      nodes = doc.steps.map((s, i) => stepToNormal(s, i));
+      const rawSteps = doc.steps.filter((s): s is ZapierStep => Boolean(s && typeof s === "object"));
+      nodes = rawSteps.map((s, i) => stepToNormal(s, i));
       // Sequential edges
-      for (let i = 0; i < doc.steps.length - 1; i++) {
+      for (let i = 0; i < rawSteps.length - 1; i++) {
         edges.push({
-          source: String(doc.steps[i]!.id ?? i),
-          target: String(doc.steps[i + 1]!.id ?? (i + 1)),
+          source: String(rawSteps[i]!.id ?? i),
+          target: String(rawSteps[i + 1]!.id ?? (i + 1)),
           type: "main",
         });
       }
-      extractedParameters = doc.steps.flatMap((s, i) =>
+      extractedParameters = rawSteps.flatMap((s, i) =>
         flattenParams(String(s.id ?? i), s.params ?? {})
       );
     } else if (doc.nodes && typeof doc.nodes === "object") {
       // ── Node-map form ────────────────────────────────────────────────────
-      const nodeMapEntries = Object.entries(doc.nodes as ZapierNodeMap);
+      const nodeMapEntries = Object.entries(doc.nodes as ZapierNodeMap).filter(
+        ([, entry]) => Boolean(entry && typeof entry === "object")
+      );
       nodes = nodeMapEntries.map(([id, entry], i) => nodeMapEntryToNormal(id, entry, i));
-      edges = (doc.edges ?? []).map((e) => ({ source: e.source, target: e.target, type: e.type ?? "main" }));
+      edges = (doc.edges ?? []).filter((e): e is ZapierEdgeSpec => Boolean(e && typeof e === "object")).map((e) => ({
+        source: String(e.source ?? ""),
+        target: String(e.target ?? ""),
+        type: e.type ?? "main",
+      }));
       extractedParameters = nodeMapEntries.flatMap(([id, entry]) =>
         flattenParams(id, entry.params ?? {})
       );

@@ -22,9 +22,11 @@ function countEnvReferences(ast: ParsedWorkflow): string[] {
 
 function hasReadme(ast: ParsedWorkflow): boolean {
   const meta = ast.metadata as Record<string, unknown> | undefined;
-  if (!meta) return false;
-  const readme = String(meta.readme ?? meta.description ?? meta.notes ?? "");
-  return readme.trim().length > 100; // must be substantive, not just a title
+  const legacyReadme = meta ? String(meta.readme ?? meta.description ?? meta.notes ?? "") : "";
+  const deepCtx = (ast as any).__deepContext;
+  const rootReadme = deepCtx?.root?.readmeContent || "";
+  const combinedReadme = (legacyReadme + "\n" + rootReadme).trim();
+  return combinedReadme.length > 50 || legacyReadme.trim().length > 100;
 }
 
 function hasChangelog(ast: ParsedWorkflow): boolean {

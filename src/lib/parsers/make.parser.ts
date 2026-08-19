@@ -40,13 +40,15 @@ const MAKE_AI_PREFIXES = ["openai", "anthropic", "cohere", "mistral", "gemini", 
 const MAKE_DELAY_MODULES = new Set(["builtin.Sleep", "tools.sleep"]);
 
 // ─── Module → service name mapping ───────────────────────────────────────────
-function classifyMakeModule(moduleType: string): {
+function classifyMakeModule(moduleType?: string): {
   name: string;
   category: string;
   isAi: boolean;
   vendorType: "saas" | "community" | "selfhosted" | "core";
 } {
-  const lower = moduleType.toLowerCase();
+  const mod = String(moduleType ?? "");
+  const lower = mod.toLowerCase();
+  if (!lower) return { name: "Unknown", category: "Unknown", isAi: false, vendorType: "saas" };
   if (lower.startsWith("http") || lower.startsWith("webhook")) return { name: "HTTP / Webhook", category: "API", isAi: false, vendorType: "core" };
   if (lower.startsWith("google-sheets") || lower.startsWith("googlesheets")) return { name: "Google Sheets", category: "Productivity", isAi: false, vendorType: "saas" };
   if (lower.startsWith("google-gmail") || lower.startsWith("gmail")) return { name: "Gmail", category: "Email", isAi: false, vendorType: "saas" };
@@ -64,11 +66,11 @@ function classifyMakeModule(moduleType: string): {
   if (lower.startsWith("postgres") || lower.startsWith("postgresql")) return { name: "PostgreSQL", category: "Database", isAi: false, vendorType: "selfhosted" };
   if (lower.startsWith("mysql")) return { name: "MySQL", category: "Database", isAi: false, vendorType: "selfhosted" };
   if (lower.startsWith("mongodb")) return { name: "MongoDB", category: "Database", isAi: false, vendorType: "selfhosted" };
-  if (MAKE_AI_PREFIXES.some((p) => lower.startsWith(p))) return { name: moduleType, category: "AI", isAi: true, vendorType: "saas" };
+  if (MAKE_AI_PREFIXES.some((p) => lower.startsWith(p))) return { name: mod, category: "AI", isAi: true, vendorType: "saas" };
   if (lower.startsWith("builtin") || lower.startsWith("flow") || lower.startsWith("tools") || lower.startsWith("json") || lower.startsWith("xml")) {
-    return { name: moduleType, category: "Core", isAi: false, vendorType: "core" };
+    return { name: mod, category: "Core", isAi: false, vendorType: "core" };
   }
-  return { name: moduleType, category: "Unknown", isAi: false, vendorType: "saas" };
+  return { name: mod, category: "Unknown", isAi: false, vendorType: "saas" };
 }
 
 // ─── Flat module interface ────────────────────────────────────────────────────
@@ -92,10 +94,13 @@ interface MakeBlueprint {
 function flattenModules(flow: MakeModule[]): MakeModule[] {
   const result: MakeModule[] = [];
   for (const mod of flow) {
+    if (!mod || typeof mod !== "object") continue;
     result.push(mod);
-    if (mod.routes) {
+    if (mod.routes && Array.isArray(mod.routes)) {
       for (const route of mod.routes) {
-        if (route.flow) result.push(...flattenModules(route.flow));
+        if (route && Array.isArray(route.flow)) {
+          result.push(...flattenModules(route.flow.filter((m): m is MakeModule => Boolean(m && typeof m === "object"))));
+        }
       }
     }
   }
@@ -107,18 +112,22 @@ function buildMakeEdges(flow: MakeModule[]): NormalEdge[] {
   const edges: NormalEdge[] = [];
   function walk(modules: MakeModule[], parentId?: string) {
     for (let i = 0; i < modules.length; i++) {
-      const mod = modules[i]!;
-      const srcId = String(mod.id);
+      const mod = modules[i];
+      if (!mod) continue;
+      const srcId = String(mod.id ?? `mod_${i}`);
       if (parentId && i === 0) {
         edges.push({ source: parentId, target: srcId, type: "main" });
-      } else if (i > 0) {
-        edges.push({ source: String(modules[i - 1]!.id), target: srcId, type: "main" });
+      } else if (i > 0 && modules[i - 1]) {
+        edges.push({ source: String(modules[i - 1]!.id ?? `mod_${i-1}`), target: srcId, type: "main" });
       }
-      if (mod.routes) {
+      if (mod.routes && Array.isArray(mod.routes)) {
         mod.routes.forEach((route, ri) => {
-          if (route.flow && route.flow.length > 0) {
-            edges.push({ source: srcId, target: String(route.flow[0]!.id), type: `route_${ri}` });
-            walk(route.flow);
+          if (route && Array.isArray(route.flow) && route.flow.length > 0) {
+            const firstChild = route.flow[0];
+            if (firstChild) {
+              edges.push({ source: srcId, target: String(firstChild.id ?? `route_first`), type: `route_${ri}` });
+              walk(route.flow.filter((m): m is MakeModule => Boolean(m && typeof m === "object")));
+            }
           }
         });
       }
@@ -128,9 +137,9 @@ function buildMakeEdges(flow: MakeModule[]): NormalEdge[] {
   return edges;
 }
 
-function makeModuleToNormal(mod: MakeModule): NormalNode {
+function makeModuleToNormal(mod: MakeModule, index: number): NormalNode {
   const params = { ...(mod.parameters ?? {}), ...(mod.mapper ?? {}) };
-  const moduleType = mod.module ?? "unknown";
+  const moduleType = String(mod.module ?? "unknown");
   const lower = moduleType.toLowerCase();
   const isHttp = MAKE_HTTP_MODULES.has(moduleType) || lower.includes("http") || lower.includes("webhook");
   const isCode = MAKE_CODE_MODULES.has(moduleType);
@@ -151,8 +160,8 @@ function makeModuleToNormal(mod: MakeModule): NormalNode {
   } : undefined;
 
   return {
-    id: String(mod.id),
-    name: `${moduleType} (${mod.id})`,
+    id: String(mod.id ?? `mod_${index}`),
+    name: `${moduleType} (${mod.id ?? index})`,
     type: `make.${moduleType}`,
     typeVersion: mod.version,
     disabled: false,
@@ -179,35 +188,57 @@ export class MakeParser implements IWorkflowParser {
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const bp = json as MakeBlueprint;
-    const rawFlow: MakeModule[] = bp.flow ?? [];
+    const bp = (json && typeof json === "object") ? (json as MakeBlueprint) : {};
+    const rawFlow: MakeModule[] = (bp.flow ?? []).filter((m): m is MakeModule => Boolean(m && typeof m === "object"));
     const allModules = flattenModules(rawFlow);
 
     const nodes: NormalNode[] = allModules.map(makeModuleToNormal);
     const edges: NormalEdge[] = buildMakeEdges(rawFlow);
     const extractedParameters: ExtractedParam[] = allModules.flatMap((m) =>
-      flattenParams(String(m.id), { ...(m.parameters ?? {}), ...(m.mapper ?? {}) })
+      flattenParams(String(m.id ?? "mod"), { ...(m.parameters ?? {}), ...(m.mapper ?? {}) })
     );
 
     const triggerNodes = allModules
-      .filter((m) => MAKE_TRIGGER_MODULES.has(m.module) || m.module.toLowerCase().includes("trigger"))
-      .map((m) => ({
-        id: String(m.id), name: `${m.module} (${m.id})`, type: `make.${m.module}`,
-        isAuthenticated: !!(m.parameters?.connection || m.parameters?.auth),
-      }));
+      .filter((m) => {
+        const mod = String(m.module ?? "");
+        return mod && (MAKE_TRIGGER_MODULES.has(mod) || mod.toLowerCase().includes("trigger"));
+      })
+      .map((m) => {
+        const mod = String(m.module ?? "unknown");
+        return {
+          id: String(m.id ?? "mod"), name: `${mod} (${m.id ?? "unknown"})`, type: `make.${mod}`,
+          isAuthenticated: !!(m.parameters?.connection || m.parameters?.auth),
+        };
+      });
 
-    const httpMods   = allModules.filter((m) => MAKE_HTTP_MODULES.has(m.module) || m.module.toLowerCase().includes("http"));
-    const codeMods   = allModules.filter((m) => MAKE_CODE_MODULES.has(m.module));
-    const aiMods     = allModules.filter((m) => MAKE_AI_PREFIXES.some((p) => m.module.toLowerCase().includes(p)));
-    const branchMods = allModules.filter((m) => MAKE_BRANCH_MODULES.has(m.module));
-    const loopMods   = allModules.filter((m) => MAKE_LOOP_MODULES.has(m.module));
+    const httpMods   = allModules.filter((m) => {
+      const mod = String(m.module ?? "");
+      return mod && (MAKE_HTTP_MODULES.has(mod) || mod.toLowerCase().includes("http"));
+    });
+    const codeMods   = allModules.filter((m) => {
+      const mod = String(m.module ?? "");
+      return mod && MAKE_CODE_MODULES.has(mod);
+    });
+    const aiMods     = allModules.filter((m) => {
+      const mod = String(m.module ?? "").toLowerCase();
+      return mod && MAKE_AI_PREFIXES.some((p) => mod.includes(p));
+    });
+    const branchMods = allModules.filter((m) => {
+      const mod = String(m.module ?? "");
+      return mod && MAKE_BRANCH_MODULES.has(mod);
+    });
+    const loopMods   = allModules.filter((m) => {
+      const mod = String(m.module ?? "");
+      return mod && MAKE_LOOP_MODULES.has(mod);
+    });
 
     const seenModules = new Set<string>();
     const integrations: ParsedWorkflow["integrations"] = [];
     for (const mod of allModules) {
-      if (seenModules.has(mod.module)) continue;
-      seenModules.add(mod.module);
-      const classified = classifyMakeModule(mod.module);
+      const modName = String(mod.module ?? "");
+      if (!modName || seenModules.has(modName)) continue;
+      seenModules.add(modName);
+      const classified = classifyMakeModule(modName);
       if (classified.vendorType !== "core") integrations.push(classified);
     }
 
@@ -232,8 +263,11 @@ export class MakeParser implements IWorkflowParser {
       httpNodesCount: httpMods.length,
       codeNodesCount: codeMods.length,
       aiNodesCount: aiMods.length,
-      hasWebhooks: allModules.some((m) => m.module.toLowerCase().includes("webhook")),
-      hasSchedules: allModules.some((m) => m.module.toLowerCase().includes("schedule") || m.module.toLowerCase().includes("cron")),
+      hasWebhooks: allModules.some((m) => String(m.module ?? "").toLowerCase().includes("webhook")),
+      hasSchedules: allModules.some((m) => {
+        const l = String(m.module ?? "").toLowerCase();
+        return l.includes("schedule") || l.includes("cron");
+      }),
       hasBranches: branchMods.length > 0,
       hasLoops: loopMods.length > 0,
       branchCount: branchMods.length,

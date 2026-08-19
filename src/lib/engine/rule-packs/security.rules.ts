@@ -132,15 +132,20 @@ export const SECURITY_PACK: RulePackManifest = {
       docReference: "https://flowintel.io/rules/SEC-002",
       detect(ast: ParsedWorkflow): Finding[] {
         const findings: Finding[] = [];
+        const deepCtx = ast.__deepContext;
         for (const node of ast.nodes) {
           const isWebhook = node.type === "n8n-nodes-base.webhook" ||
             (node.isTrigger && node.isHttp && node.type.toLowerCase().includes("webhook"));
           if (!isWebhook) continue;
           const p = node.parameters as Record<string, unknown> | undefined;
           const auth = p?.authentication ?? p?.auth ?? p?.authType;
+          const nodeCtx = deepCtx?.getNodeContext(node.id) || deepCtx?.getNodeContext(node.name);
+          const resolvedAuth = nodeCtx?.resolvedAuth;
           const hasCreds = node.isAuthenticated === true ||
-            (node.credentials && Object.keys(node.credentials).length > 0);
-          if ((!auth || auth === "none") && !hasCreds) {
+            (node.credentials && Object.keys(node.credentials).length > 0) ||
+            (nodeCtx?.hasAuth ?? false);
+          const isAuthConfigured = (auth && auth !== "none") || (resolvedAuth && resolvedAuth !== "none" && resolvedAuth !== "undefined") || hasCreds;
+          if (!isAuthConfigured) {
             findings.push({
               id: makeFindingId("SEC-002", node.id),
               ruleId: "SEC-002",

@@ -36,25 +36,26 @@ const AI_TASK_PREFIXES    = ["prefect_openai", "prefect_anthropic", "prefect_bed
 const SHELL_TASK_TYPES    = ["prefect.tasks.shell.ShellTask", "prefect_shell", "bash_task"];
 
 function toNormalNode(task: PrefectTask, idx: number): NormalNode {
-  const taskType = task.task_type ?? "python_task";
+  const safeTask = (task && typeof task === "object") ? task : ({} as PrefectTask);
+  const taskType = String(safeTask.task_type ?? "python_task");
   const lower    = taskType.toLowerCase();
   const isHttp   = HTTP_TASK_PREFIXES.some((p) => lower.includes(p));
   const isAi     = AI_TASK_PREFIXES.some((p) => lower.includes(p));
   const isShell  = SHELL_TASK_TYPES.some((p) => lower.includes(p));
   const isCode   = !isHttp && !isAi;
 
-  const params   = task.parameters ?? {};
+  const params   = (safeTask.parameters && typeof safeTask.parameters === "object") ? safeTask.parameters : {};
 
   return {
-    id:          task.slug ?? task.name ?? `task-${idx}`,
-    name:        task.name ?? task.slug ?? `Task ${idx}`,
+    id:          String(safeTask.slug ?? safeTask.name ?? `task-${idx}`),
+    name:        String(safeTask.name ?? safeTask.slug ?? `Task ${idx}`),
     type:        taskType,
     typeVersion: 1,
     disabled:    false,
     position:    [200 + idx * 220, 300],
     parameters:  params,
     credentials: {},
-    isTrigger:   (task.upstream_dependencies ?? []).length === 0 && idx === 0,
+    isTrigger:   (safeTask.upstream_dependencies ?? []).length === 0 && idx === 0,
     isHttp,
     isCode,
     isAi,
@@ -74,9 +75,9 @@ function toNormalNode(task: PrefectTask, idx: number): NormalNode {
 }
 
 function normalizeTasks(flow: PrefectFlowJson): PrefectTask[] {
-  if (Array.isArray(flow.tasks))                  return flow.tasks;
-  if (Array.isArray(flow.task_runs))              return flow.task_runs;
-  if (flow.flow_run?.task_runs)                   return flow.flow_run.task_runs;
+  if (Array.isArray(flow.tasks))                  return flow.tasks.filter((t): t is PrefectTask => Boolean(t && typeof t === "object"));
+  if (Array.isArray(flow.task_runs))              return flow.task_runs.filter((t): t is PrefectTask => Boolean(t && typeof t === "object"));
+  if (flow.flow_run && Array.isArray(flow.flow_run.task_runs)) return flow.flow_run.task_runs.filter((t): t is PrefectTask => Boolean(t && typeof t === "object"));
   return [];
 }
 
@@ -90,29 +91,28 @@ export class PrefectParser implements IWorkflowParser {
     if (obj.flow_run && typeof obj.flow_run === "object") return true;
     // Deployment manifest with tasks array containing slug/task_type fields
     if (Array.isArray(obj.tasks)) {
-      const first = (obj.tasks as unknown[])[0];
-      if (first && typeof first === "object") {
-        const t = first as Record<string, unknown>;
-        if ("slug" in t || "task_type" in t || "upstream_dependencies" in t) return true;
+      const first = (obj.tasks as unknown[]).find((t) => Boolean(t && typeof t === "object")) as Record<string, unknown> | undefined;
+      if (first) {
+        if ("slug" in first || "task_type" in first || "upstream_dependencies" in first) return true;
       }
     }
     return false;
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const flow  = json as PrefectFlowJson;
+    const flow  = (json && typeof json === "object") ? (json as PrefectFlowJson) : {};
     const rawTasks = normalizeTasks(flow);
     const nodes = rawTasks.map(toNormalNode);
 
     const edges: NormalEdge[] = [];
     for (const task of rawTasks) {
       for (const dep of task.upstream_dependencies ?? []) {
-        if (dep.id) edges.push({ source: dep.id, target: task.slug ?? task.name ?? "", type: "main" });
+        if (dep && dep.id) edges.push({ source: String(dep.id), target: String(task.slug ?? task.name ?? ""), type: "main" });
       }
     }
 
     const extractedParameters = rawTasks.flatMap((t, i) =>
-      flattenParams(t.slug ?? t.name ?? `task-${i}`, t.parameters ?? {})
+      flattenParams(String(t.slug ?? t.name ?? `task-${i}`), (t.parameters && typeof t.parameters === "object" ? t.parameters : {}))
     );
 
     const name = flow.name ?? "Untitled Prefect Flow";

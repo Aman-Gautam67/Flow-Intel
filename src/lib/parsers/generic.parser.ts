@@ -16,21 +16,31 @@ import { flattenParams } from "./normalise";
 type RawItem = Record<string, unknown>;
 
 // Keys that may hold the node/task array
-const NODE_ARRAY_KEYS = ["nodes", "tasks", "steps", "jobs", "actions", "stages"];
-// Keys that carry dependency lists
-const DEP_KEYS = [
-  "depends_on", "dependencies", "upstream", "upstream_task_ids",
-  "downstream_task_ids", "next", "after", "requires",
+const NODE_ARRAY_KEYS = [
+  "nodes", "tasks", "steps", "jobs", "actions", "stages",
+  "pipeline", "pipelines", "workflow", "workflows", "dag", "dags",
+];
+// Keys that declare upstream dependencies (dependency -> current)
+const UPSTREAM_DEP_KEYS = [
+  "depends_on", "dependencies", "upstream", "upstream_task_ids", "after", "requires",
+];
+// Keys that declare downstream targets (current -> target)
+const DOWNSTREAM_DEP_KEYS = [
+  "downstream_task_ids", "next",
 ];
 
 function findNodeArray(obj: Record<string, unknown>): RawItem[] | null {
+  if (!obj || typeof obj !== "object") return null;
   for (const key of NODE_ARRAY_KEYS) {
     if (Array.isArray(obj[key]) && (obj[key] as unknown[]).length > 0) {
-      const arr = obj[key] as unknown[];
-      // Confirm items look like nodes (have at least one of id/name/type)
-      const first = arr[0] as Record<string, unknown>;
-      if (first && ("id" in first || "name" in first || "type" in first || "task_id" in first)) {
-        return arr as RawItem[];
+      const arr = (obj[key] as unknown[]).filter(
+        (x): x is Record<string, unknown> => Boolean(x && typeof x === "object")
+      );
+      if (arr.length === 0) continue;
+      // Confirm items look like nodes (have at least one of id/name/type/task_id) or are inside a dedicated pipeline/dag/tasks key
+      const first = arr[0];
+      if (first && ("id" in first || "name" in first || "type" in first || "task_id" in first || "step" in first || "action" in first || "label" in first || ["pipeline", "pipelines", "workflow", "workflows", "dag", "dags", "tasks", "steps", "jobs", "actions", "stages"].includes(key))) {
+        return arr;
       }
     }
   }
@@ -58,30 +68,63 @@ function buildEdges(items: RawItem[], idxMap: Map<string, string>): NormalEdge[]
   const edges: NormalEdge[] = [];
   const addedSet = new Set<string>();
 
-  for (let i = 0; i < items.length; i++) {
-    const item   = items[i]!;
-    const srcId  = idxMap.get(String(i))!;
-
-    // Explicit dependency declarations
-    let foundExplicit = false;
-    for (const depKey of DEP_KEYS) {
+  // Check if any explicit dependency is declared anywhere in the workflow
+  let hasAnyExplicitDeps = false;
+  for (const item of items) {
+    for (const depKey of [...UPSTREAM_DEP_KEYS, ...DOWNSTREAM_DEP_KEYS]) {
       const deps = item[depKey];
-      if (Array.isArray(deps)) {
-        foundExplicit = true;
-        for (const d of deps) {
-          const targetId = String(d);
-          const edgeKey  = `${srcId}→${targetId}`;
-          if (!addedSet.has(edgeKey)) {
-            edges.push({ source: srcId, target: targetId, type: "main" });
-            addedSet.add(edgeKey);
+      if (Array.isArray(deps) && deps.length > 0) {
+        hasAnyExplicitDeps = true;
+        break;
+      }
+    }
+    if (hasAnyExplicitDeps) break;
+  }
+
+  if (hasAnyExplicitDeps) {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]!;
+      const currentId = idxMap.get(String(i))!;
+
+      // Upstream dependencies: dependency runs first, edge is upstream -> current
+      for (const depKey of UPSTREAM_DEP_KEYS) {
+        const deps = item[depKey];
+        if (Array.isArray(deps)) {
+          for (const d of deps) {
+            if (d !== null && d !== undefined) {
+              const upstreamId = String(d);
+              const edgeKey = `${upstreamId}→${currentId}`;
+              if (!addedSet.has(edgeKey)) {
+                edges.push({ source: upstreamId, target: currentId, type: "main" });
+                addedSet.add(edgeKey);
+              }
+            }
+          }
+        }
+      }
+
+      // Downstream dependencies: current runs first, edge is current -> downstream
+      for (const depKey of DOWNSTREAM_DEP_KEYS) {
+        const deps = item[depKey];
+        if (Array.isArray(deps)) {
+          for (const d of deps) {
+            if (d !== null && d !== undefined) {
+              const downstreamId = String(d);
+              const edgeKey = `${currentId}→${downstreamId}`;
+              if (!addedSet.has(edgeKey)) {
+                edges.push({ source: currentId, target: downstreamId, type: "main" });
+                addedSet.add(edgeKey);
+              }
+            }
           }
         }
       }
     }
-
-    // Linear chain fallback when no explicit deps found
-    if (!foundExplicit && i < items.length - 1) {
-      const nextId  = idxMap.get(String(i + 1))!;
+  } else {
+    // Linear chain fallback only when NO explicit dependencies are declared in the workflow
+    for (let i = 0; i < items.length - 1; i++) {
+      const srcId = idxMap.get(String(i))!;
+      const nextId = idxMap.get(String(i + 1))!;
       const edgeKey = `${srcId}→${nextId}`;
       if (!addedSet.has(edgeKey)) {
         edges.push({ source: srcId, target: nextId, type: "main" });
@@ -89,6 +132,7 @@ function buildEdges(items: RawItem[], idxMap: Map<string, string>): NormalEdge[]
       }
     }
   }
+
   return edges;
 }
 
@@ -103,8 +147,10 @@ export class GenericParser implements IWorkflowParser {
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const obj   = json as Record<string, unknown>;
-    const items = findNodeArray(obj)!;
+    const obj   = (json && typeof json === "object" ? json : {}) as Record<string, unknown>;
+    const items = (findNodeArray(obj) ?? []).filter(
+      (x): x is Record<string, unknown> => Boolean(x && typeof x === "object")
+    );
 
     // Build id map: index → canonical id string
     const idxMap = new Map<string, string>();

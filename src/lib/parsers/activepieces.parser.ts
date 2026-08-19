@@ -4,42 +4,50 @@ import { flattenParams } from "./normalise";
 export class ActivepiecesParser implements IWorkflowParser {
   supports(json: unknown): boolean {
     if (!json || typeof json !== "object") return false;
-    const obj = json as any;
-    return obj.trigger && typeof obj.trigger.name === "string" && typeof obj.trigger.type === "string" && 
-           (obj.trigger.nextAction || obj.trigger.settings);
+    const obj = json as Record<string, unknown>;
+    if (obj.platform === "ACTIVEPIECES" || obj.platform === "activepieces") return true;
+    if (!obj.trigger || typeof obj.trigger !== "object") return false;
+    const trigger = obj.trigger as Record<string, unknown>;
+    return (
+      typeof trigger.type === "string" &&
+      (trigger.nextAction !== undefined ||
+        trigger.settings !== undefined ||
+        typeof trigger.name === "string" ||
+        typeof trigger.displayName === "string")
+    );
   }
 
   parse(json: unknown): ParsedWorkflow {
-    const obj = json as any;
+    const obj = (json && typeof json === "object") ? (json as Record<string, unknown>) : {};
     
     const nodes: NormalNode[] = [];
     const edges: NormalEdge[] = [];
-    let extractedParameters: any[] = [];
-    const triggerNodes: any[] = [];
-    const integrations: any[] = [];
+    const extractedParameters: ReturnType<typeof flattenParams> = [];
+    const triggerNodes: ParsedWorkflow["triggerNodes"] = [];
+    const integrations: ParsedWorkflow["integrations"] = [];
     
     let aiNodesCount = 0;
     let httpNodesCount = 0;
     let codeNodesCount = 0;
 
-    let currentNode = obj.trigger;
+    const currentNode = (obj.trigger && typeof obj.trigger === "object") ? (obj.trigger as Record<string, unknown>) : undefined;
 
     // A queue for processing branches
-    const queue: { action: any; parentId?: string; branchHandle?: string }[] = [];
+    const queue: { action: Record<string, unknown>; parentId?: string; branchHandle?: string }[] = [];
     if (currentNode) {
       queue.push({ action: currentNode });
     }
 
     while (queue.length > 0) {
       const { action, parentId, branchHandle } = queue.shift()!;
-      if (!action) continue;
+      if (!action || typeof action !== "object") continue;
 
-      const id = action.name || `node_${nodes.length}`;
-      const type = action.type;
+      const id = String(action.name ?? `node_${nodes.length}`);
+      const type = String(action.type ?? "PIECE");
       
-      const settings = action.settings || {};
-      const pieceName = settings.pieceName || "";
-      const actionName = settings.actionName || "";
+      const settings = (action.settings && typeof action.settings === "object") ? (action.settings as Record<string, unknown>) : {};
+      const pieceName = String(settings.pieceName ?? "");
+      const actionName = String(settings.actionName ?? "");
       
       const pieceNameLower = pieceName.toLowerCase();
       const actionNameLower = actionName.toLowerCase();
@@ -85,26 +93,26 @@ export class ActivepiecesParser implements IWorkflowParser {
       nodes.push(node);
       extractedParameters.push(...flattenParams(node.id, parameters));
 
-      if (action.nextAction) {
-        queue.push({ action: action.nextAction, parentId: id });
+      if (action.nextAction && typeof action.nextAction === "object") {
+        queue.push({ action: action.nextAction as Record<string, unknown>, parentId: id });
       }
 
       // Handle branches
-      if (type === "BRANCH" && action.onSuccessAction) {
-        queue.push({ action: action.onSuccessAction, parentId: id, branchHandle: "true" });
+      if (type === "BRANCH" && action.onSuccessAction && typeof action.onSuccessAction === "object") {
+        queue.push({ action: action.onSuccessAction as Record<string, unknown>, parentId: id, branchHandle: "true" });
       }
-      if (type === "BRANCH" && action.onFailureAction) {
-        queue.push({ action: action.onFailureAction, parentId: id, branchHandle: "false" });
+      if (type === "BRANCH" && action.onFailureAction && typeof action.onFailureAction === "object") {
+        queue.push({ action: action.onFailureAction as Record<string, unknown>, parentId: id, branchHandle: "false" });
       }
 
       // Handle loops
-      if (type === "LOOP_ON_ITEMS" && action.firstLoopAction) {
-        queue.push({ action: action.firstLoopAction, parentId: id, branchHandle: "loop" });
+      if (type === "LOOP_ON_ITEMS" && action.firstLoopAction && typeof action.firstLoopAction === "object") {
+        queue.push({ action: action.firstLoopAction as Record<string, unknown>, parentId: id, branchHandle: "loop" });
       }
     }
 
     return {
-      name: obj.displayName || "Activepieces Flow",
+      name: String(obj.displayName ?? "Activepieces Flow"),
       platform: "ACTIVEPIECES",
       nodeCount: nodes.length,
       connectionCount: edges.length,
@@ -123,7 +131,7 @@ export class ActivepiecesParser implements IWorkflowParser {
       branchCount: nodes.filter(n => n.isBranch).length,
       loopCount: nodes.filter(n => n.isLoop).length,
       extractedSecretsCount: 0,
-      rawNodes: [obj.trigger],
+      rawNodes: obj.trigger ? [obj.trigger] : [],
       rawConnections: {}
     };
   }
