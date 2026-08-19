@@ -5,7 +5,7 @@ export const ENGINE_STATS = {
   rules:       402,
   categories:  10,
   gates:        5,
-  platforms:    6,
+  platforms:   14,
   dimensions:   9,
   autoFixes:   48,   // rules that ship autoFix patches
 };

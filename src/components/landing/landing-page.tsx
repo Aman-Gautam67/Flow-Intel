@@ -170,7 +170,7 @@ export function LandingPage() {
         </h1>
 
         <p className="text-base text-[var(--color-fi-muted)] max-w-[540px] leading-relaxed mb-10 font-light">
-          Drop your n8n, Make, Zapier, or Flowise JSON export and get an instant 9-dimensional security and quality report —
+          Drop your n8n, Make, Zapier, Flowise, LangFlow, Dify, CrewAI, AutoGen, Pipedream, or OpenAI Agents workflow export and get an instant 9-dimensional security and quality report —
           hardcoded credentials, PII leaks, unbounded agent loops, and more. No AI, no cloud.
         </p>
 

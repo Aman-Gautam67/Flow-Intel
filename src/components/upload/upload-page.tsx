@@ -214,8 +214,14 @@ export function UploadPage() {
             Upload a <code className="font-mono text-[var(--color-fi-accent)] text-xs">.json</code> export from{" "}
             <span style={{ color: "var(--color-fi-text)" }}>n8n</span>,{" "}
             <span style={{ color: "var(--color-fi-text)" }}>Make</span>,{" "}
-            <span style={{ color: "var(--color-fi-text)" }}>Zapier</span>, or{" "}
-            <span style={{ color: "var(--color-fi-text)" }}>Flowise / LangFlow</span>{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>Zapier</span>,{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>Flowise</span>,{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>LangFlow</span>,{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>Dify</span>,{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>CrewAI</span>,{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>AutoGen</span>,{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>Pipedream</span>, or{" "}
+            <span style={{ color: "var(--color-fi-text)" }}>OpenAI Agents</span>{" "}
             for an instant 9-dimension intelligence report.
           </p>
         </div>

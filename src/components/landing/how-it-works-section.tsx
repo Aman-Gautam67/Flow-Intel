@@ -7,7 +7,7 @@ const STEPS = [
     n: "01",
     icon: FileJson,
     title: "Parse",
-    detail: "JSON export from n8n, Make, Zapier, or Flowise is normalised into a platform-agnostic WorkflowAST — nodes, edges, parameters, credentials.",
+    detail: "JSON/YAML export from n8n, Make, Zapier, Flowise, LangFlow, Dify, CrewAI, AutoGen, Pipedream, or OpenAI Agents is normalised into a platform-agnostic WorkflowAST — nodes, edges, parameters, credentials.",
     color: "#86a7ff",
   },
   {

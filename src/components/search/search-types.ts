@@ -4,12 +4,21 @@
  */
 
 export const PLATFORMS = [
-  { value: "", label: "All Platforms" },
-  { value: "N8N",      label: "n8n" },
-  { value: "MAKE",     label: "Make" },
-  { value: "ZAPIER",   label: "Zapier" },
-  { value: "FLOWISE",  label: "Flowise" },
-  { value: "LANGFLOW", label: "LangFlow" },
+  { value: "",            label: "All Platforms" },
+  { value: "N8N",         label: "n8n" },
+  { value: "MAKE",        label: "Make" },
+  { value: "ZAPIER",      label: "Zapier" },
+  { value: "FLOWISE",     label: "Flowise" },
+  { value: "LANGFLOW",    label: "LangFlow" },
+  { value: "DIFY",        label: "Dify" },
+  { value: "CREWAI",      label: "CrewAI" },
+  { value: "AUTOGEN",     label: "AutoGen" },
+  { value: "PIPEDREAM",   label: "Pipedream" },
+  { value: "OPENAI_AGENTS", label: "OpenAI Agents" },
+  { value: "NODE_RED",    label: "Node-RED" },
+  { value: "ACTIVEPIECES", label: "Activepieces" },
+  { value: "AIRFLOW",     label: "Airflow" },
+  { value: "PREFECT",     label: "Prefect" },
 ] as const;
 
 // Quick-filter chips shown horizontally above results
