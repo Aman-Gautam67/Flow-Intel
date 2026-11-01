@@ -1,276 +1,225 @@
-# FlowIntel
+<div align="center">
 
-**The most advanced Workflow Intelligence Platform.**
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:070617,55:1e1b4b,100:6366f1&height=235&section=header&text=FlowIntel&fontSize=46&fontColor=eef0ff&fontAlignY=40&desc=A%20linter%20for%20n8n%20workflows%2C%20with%20opinions&descSize=17&descAlignY=62&animation=twinkling" alt="FlowIntel" width="100%">
 
-FlowIntel is not a workflow builder. It is a platform for **discovering, analyzing, verifying, comparing, and future-proofing automation workflows** across every major automation engine.
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=500&size=19&duration=3200&pause=900&color=a5b4fc&center=true&vCenter=true&width=700&lines=341%20rules%20across%2010%20base%20packs%20and%2016%20extensions;Nine%20dimensions%2C%20one%20FQI%20score%2C%20no%20execution;Drop%20the%20JSON%2C%20get%20a%20graph%2C%20a%20fix%20list%20and%20a%20badge" alt="Typing animation" />
 
-Think of it as **Google + GitHub + App Store for automation workflows** — combined with an industry-leading **Compatibility Drift & Migration Intelligence Engine**.
+<br />
 
----
+<a href="https://work-flow-intel.vercel.app"><img src="https://img.shields.io/badge/%E2%96%B6%20Audit%20a%20workflow-6366f1?style=for-the-badge&labelColor=070617&logo=vercel&logoColor=a5b4fc" alt="Audit a workflow" /></a>
 
-## What It Does
+</div>
 
-| Capability | Description |
-|---|---|
-| **Workflow Analysis** | Upload any n8n, Make, Zapier, Flowise, or LangFlow workflow and get a deterministic quality report in under 1 second |
-| **Flow Quality Index (FQI)** | A single 0–100 score combining 9 dimensions: Health, Security, Simplicity, Reliability, Debt, Memory, Resilience, Privacy, AI Guardrails |
-| **Security Audit** | 252+ rules detecting hardcoded secrets, unauthenticated webhooks, unsafe eval(), SQL injection, unencrypted HTTP, PII exposure |
-| **AI Guardrails** | Detects prompt injection risk, missing maxTokens, no-timeout agents, unvalidated LLM outputs, dangerous tool attachments |
-| **Compatibility Drift** | Detects deprecated nodes, broken typeVersions, removed APIs, and credential schema changes — all backed by official platform documentation |
-| **Quality Gates** | 5 gates: Security, Production, Marketplace, Reliability, and Enterprise — workflows must pass all to earn certification |
-| **Workflow Catalog** | Searchable, filterable catalog of every analyzed workflow with FQI badges, score bars, and engagement metrics |
-| **Engagement Tracking** | Per-workflow view, download, and bookmark counters |
-| **Badge API** | Embeddable SVG badges: `/api/badge/[slug]/security.svg` — live scores for READMEs |
-| **CI/CD Audit** | `POST /api/v1/audit` — pass/fail + violations array for GitHub Actions, GitLab CI, or any HTTP step |
-| **MCP Server** | Exposes workflow analysis as MCP tools for AI agents and LLM pipelines |
+<div align="center">
 
----
+<img src="https://img.shields.io/badge/Fork%20of-Aman--Gautam67%2FFlow--Intel-818cf8?style=flat-square&labelColor=070617" alt="Fork of Aman-Gautam67/Flow-Intel" />
+<img src="https://img.shields.io/badge/Licence-GPL--3.0-a5b4fc?style=flat-square&labelColor=070617" alt="GPL-3.0" />
+<img src="https://img.shields.io/badge/Rules-341-6366f1?style=flat-square&labelColor=070617" alt="341 rules" />
+<img src="https://img.shields.io/badge/Dimensions-9-4f46e5?style=flat-square&labelColor=070617" alt="9 dimensions" />
+<img src="https://img.shields.io/badge/Executes-nothing-818cf8?style=flat-square&labelColor=070617" alt="No execution" />
 
-## Supported Platforms
+</div>
 
-- **n8n** — full node schema, typeVersion, expression, credential analysis
-- **Make (Integromat)** — module analysis
-- **Zapier** — action/trigger analysis
-- **Flowise** — AI pipeline analysis
-- **LangFlow** — AI flow analysis
+<br />
 
-Architecture is extensible for MCP workflows, AutoGen, CrewAI, Dify, Pipedream, Node-RED, Activepieces, OpenAI Agents SDK.
+<div align="center">
+
+### <a href="https://work-flow-intel.vercel.app">work-flow-intel.vercel.app</a>
+
+<sub>This is a <b>fork</b>. The engine was designed upstream by <a href="https://github.com/Aman-Gautam67/Flow-Intel">Aman Gautam</a>; this deployment is the fork that stays current and runs a second instance.</sub>
+
+</div>
 
 ---
 
-## Tech Stack
+<div align="center">
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router) + React 19 |
-| Runtime | Bun |
-| Language | TypeScript (strict) |
-| Styling | Tailwind CSS v4 |
-| Database | PostgreSQL via Drizzle ORM + `@neondatabase/serverless` |
-| Analysis Engine | 252+ deterministic rules across 10 rule packs |
+## What it is
+
+</div>
+
+You export a workflow from n8n as JSON and drop it in. FlowIntel parses the node graph, runs it against **341 rules**, and returns an **FQI** — a Flow Quality Index from 0 to 100 — broken across nine dimensions: **health, security, simplicity, reliability, debt, memory, resilience, privacy and AI guardrails**.
+
+Nothing is executed. There is no n8n instance attached, no credentials used, no node ever runs. It reads the JSON the way a linter reads source: the artifact is data, and everything FlowIntel knows comes from that data.
+
+The consequence is that it is safe to point at a workflow handling live customer records — and equally that it cannot tell you whether the workflow works. It tells you whether it is *built* well.
+
+<div align="center">
+
+<sub>Output is not a score and a shrug: per-rule flags with file-level line references, a remediation drawer for each finding, a workflow graph, a diff view against a previous version, and a PDF report.</sub>
+
+</div>
 
 ---
 
-## Getting Started
+<div align="center">
 
-### Prerequisites
+## What you get
 
-- [Bun](https://bun.sh) ≥ 1.1
-- PostgreSQL database (local or [Neon](https://neon.tech) free tier)
+</div>
 
-### Local Development
+<ul>
+<li><b>FQI across nine dimensions</b> — each dimension has published grading parameters, and each is shown with a popover explaining exactly what moved the number. No black box.</li>
+<li><b>Rule-level findings</b> — severity, category, the offending node, and a concrete remediation. Rules are grouped into packs so a finding can be framed as a class of problem rather than a one-off.</li>
+<li><b>Workflow graph</b> — the node graph rendered as a graph, so an orphaned or disconnected node is visible rather than inferred.</li>
+<li><b>Quality gates</b> — thresholds you can fail a pipeline on, not just a colour on a dashboard. That is what makes it usable in CI.</li>
+<li><b>Diff and drift</b> — re-analyse a later version and see which findings appeared, which were fixed, and which score dimensions moved, with a dedicated drift panel.</li>
+<li><b>Badges and certificates</b> — <code>/api/badge/&lt;slug&gt;/&lt;metric&gt;.svg</code> serves a live shield for a workflow's score or dimension, and a certificate route issues a verifiable record of a pass.</li>
+<li><b>CI endpoint</b> — <code>POST /api/v1/audit</code> takes a workflow and returns the report, so a repository can gate on FQI the same way it gates on tests.</li>
+<li><b>MCP server</b> — <code>/api/mcp</code> exposes the analyser as tools, so an agent can audit a workflow without a browser.</li>
+<li><b>Bulk workspace</b> — drop many exported workflows at once, compare, and export the results together instead of one file at a time.</li>
+<li><b>Bilingual</b> — <code>en-US</code> and <code>zh-CN</code> through one i18n provider with a language switcher.</li>
+</ul>
 
-```bash
-# 1. Install dependencies
+---
+
+<div align="center">
+
+## Stack
+
+</div>
+
+<ul>
+<li><b>Next.js 16 + React 19 + Bun</b> — App Router, server routes for parsing and analysis, client components for the dashboard.</li>
+<li><b>Drizzle + Neon Postgres</b> — workflows, versions, engagement counters and certificates.</li>
+<li><b>A rule engine with a registry</b> — rules register themselves; packs are manifests; the engine never needs editing to gain a rule.</li>
+<li><b>Tailwind CSS + Radix</b> — the dashboard, drawers, command palette.</li>
+<li><b>Server-rendered SVG badges</b> — a badge is a route, not an image asset.</li>
+</ul>
+
+<div align="center">
+
+<img src="https://skillicons.dev/icons?i=nextjs,react,ts,bun,postgres,tailwind,vercel,git" alt="Next.js, React, TypeScript, Bun, Postgres, Tailwind, Vercel, Git" />
+
+</div>
+
+---
+
+<div align="center">
+
+## Under the hood
+
+</div>
+
+<details>
+<summary><b>A registry that fails fast</b> — why rule IDs are permanent</summary>
+
+<br />
+
+<p>Every rule is a map entry, and registering a duplicate throws at module load:</p>
+
+<pre><code>register(rule: RuleDefinition): void {
+  if (this.rules.has(rule.id)) {
+    throw new Error(
+      `[RuleRegistry] Duplicate rule ID "${rule.id}". Rule IDs are permanent — ` +
+      `rename the new rule or deregister the existing one first.`
+    );
+  }
+  this.rules.set(rule.id, rule);
+}</code></pre>
+
+<p>The strictness is the point. A finding's identity is its rule ID; if IDs could be reused, every historical report, diff and badge would silently change meaning. Failing at startup is cheap; a diff that lies is not.</p>
+
+<p>Packs are registered the same way, and a duplicate pack ID throws too. Adding a category of checks is a new file plus one line in <code>rule-packs/index.ts</code>.</p>
+
+</details>
+
+<details>
+<summary><b>341 rules, ten packs, sixteen extensions</b></summary>
+
+<br />
+
+<p>The packs cover <b>security, reliability, idempotency, observability, maintainability, performance, compatibility, privacy, documentation and cost optimisation</b>. Each ships a base pack plus zero or more <code>-ext</code> files — security, reliability, privacy, performance and maintainability carry two extensions each.</p>
+
+<p>So the extension files are not residue, they are the growth path: the base pack stays readable as the canonical set for a category, and new rules land beside it in an extension pack without turning one file into an unreadable list. Counted from the pack sources, that is <b>341 unique rule IDs</b>.</p>
+
+</details>
+
+<details>
+<summary><b>Nine dimensions, and why they are not the rule packs</b></summary>
+
+<br />
+
+<p>The rule packs are how checks are <i>organised for authors</i>. The nine dimensions are how scores are <i>organised for readers</i>. They are different axes on purpose:</p>
+
+<ul>
+<li><b>Dimensions</b> — health, security, simplicity, reliability, debt, memory, resilience, privacy, ai_guard. These are what the ring grid shows and what the FQI aggregates.</li>
+<li><b>Packs</b> — where a rule lives. One pack can feed several dimensions; one dimension draws from several packs.</li>
+</ul>
+
+<p>Each dimension publishes its grading parameters — the actual node properties and conditions the engine inspects. "Security dropped 12 points" is only useful if you can read what "security" measures, so that text ships with the app rather than living in a wiki.</p>
+
+</details>
+
+<details>
+<summary><b>Two analysis paths, one output shape</b></summary>
+
+<br />
+
+<p>The newer engine returns a v2 <code>AnalysisReport</code>; the original UI was built against a v1 <code>ScoreBreakdown</code>. Rather than rewrite the UI or fork the engine, an adapter bridges them:</p>
+
+<pre><code>ParsedWorkflow → analysis-runner → AnalysisReport → adapter-bridge → ScoreBreakdown
+                                   (v2 attached as scores._v2Report)</code></pre>
+
+<p>The sync path is kept deliberately: an upload preview runs client-side and cannot await a SHA-256 fingerprint or a database write. So <code>analyze()</code> uses the sync fallback and returns immediately, while <code>analyzeAsync()</code> is used by server routes where the fingerprint is written to Postgres. Same rules, same scores — one of them just knows less about identity.</p>
+
+</details>
+
+<details>
+<summary><b>Static means static</b></summary>
+
+<br />
+
+<p>No workflow is imported into n8n, no credential is decrypted, no node is invoked. Everything is computed from the exported JSON: node types, parameters, graph edges, and the presence or absence of configuration.</p>
+
+<p>That constraint is why the security rules can be specific without being reckless — checking that a webhook node has <code>authentication === 'none'</code> is a static property, not a probe.</p>
+
+</details>
+
+---
+
+<div align="center">
+
+## Project structure
+
+</div>
+
+<pre><code>Flow-Intel/
+├── src/app/
+│   ├── page.tsx  search/  upload/
+│   ├── workflows/[slug]/        # dashboard + diff
+│   └── api/
+│       ├── parse  v2/analyze  v1/audit
+│       ├── badge/[slug]/[metric]   # live SVG
+│       ├── v2/certificate/[id]  v2/marketplace/*
+│       ├── mcp                      # agent tools
+│       └── workflows/[slug]/engage
+├── src/lib/engine/
+│   ├── registry.ts  rule-engine.ts  quality-gates.ts
+│   ├── rule-packs/                  # 10 base + 16 extension packs
+│   └── analysis-runner.ts  adapter-bridge.ts  passport.ts
+├── src/lib/analyzer/                # v1 rules, one per dimension
+└── src/config/dimensions.ts         # the nine dimensions, documented</code></pre>
+
+---
+
+<div align="center">
+
+## Run it
+
+</div>
+
+<pre><code>git clone https://github.com/Jivaansh-Yadav/Flow-Intel.git
+cd Flow-Intel
 bun install
+bun run dev            # next dev</code></pre>
 
-# 2. Configure environment
-cp .env.example .env
-# Edit .env — set DATABASE_URL to your Postgres connection string
+<p>A Neon <code>DATABASE_URL</code> is needed for persistence — workflow history, engagement and certificates. Analysis itself runs without it; you lose the archive, not the audit.</p>
 
-# 3. Run database migrations
-bun run db:migrate
+<div align="center">
 
-# 4. Start dev server
-bun run dev
-# → http://localhost:3000
-```
+<sub><b>Built-by :</b> <a href = "github.com/Jivaansh-Yadav"> Jivaansh </a> and <a href = "github.com/Aman-Gautam67"> Aman </a>.<br> <b>License :</b> GPL-3.0. This fork keeps the licence and the attribution; the deployment, the badge/certificate routes and the MCP surface are what it adds on top.</sub>
 
-### Environment Variables
+</div>
 
-| Variable | Required | Description |
-|---|---|---|
-| `DATABASE_URL` | ✅ | PostgreSQL connection string |
-| `CRON_SECRET` | ✅ | Auth token for cron endpoints |
-
----
-
-## Project Structure
-
-```
-src/
-├── app/
-│   ├── api/
-│   │   ├── parse/route.ts              ← POST: analyze a workflow JSON
-│   │   ├── workflows/route.ts          ← GET: catalog search + filters
-│   │   ├── workflows/[slug]/engage/    ← GET/POST: view/download/bookmark counters
-│   │   ├── v1/audit/route.ts           ← CI/CD audit endpoint
-│   │   ├── v2/analyze/route.ts         ← Full v2 engine analysis
-│   │   ├── v2/certificate/[id]/        ← Certificate fetch
-│   │   ├── badge/[slug]/[metric]/      ← SVG badge generation
-│   │   ├── fetch-url/route.ts          ← CORS proxy for remote workflow import
-│   │   └── mcp/route.ts                ← MCP Streamable HTTP server
-│   ├── page.tsx                        ← Landing page
-│   ├── upload/page.tsx                 ← Workflow analysis page
-│   ├── search/page.tsx                 ← Catalog discovery page
-│   └── workflows/[slug]/page.tsx       ← Workflow dashboard
-│
-├── components/
-│   ├── landing/                        ← Landing page sections
-│   │   ├── landing-page.tsx
-│   │   ├── engine-stats-bar.tsx
-│   │   ├── engine-details-section.tsx
-│   │   ├── how-it-works-section.tsx
-│   │   └── compatibility-drift-section.tsx
-│   ├── upload/                         ← Analysis upload flow
-│   │   ├── upload-page.tsx
-│   │   ├── inline-report-panel.tsx
-│   │   ├── bulk-workspace.tsx
-│   │   └── import-modal.tsx
-│   ├── search/                         ← Catalog search UI
-│   │   ├── search-page.tsx
-│   │   ├── search-sidebar.tsx
-│   │   ├── workflow-card.tsx
-│   │   └── search-types.ts
-│   └── workflow/                       ← Workflow dashboard
-│       ├── workflow-dashboard.tsx
-│       ├── engagement-strip.tsx
-│       ├── drift-panel.tsx
-│       ├── score-ring.tsx
-│       ├── workflow-graph.tsx
-│       └── remediation-drawer.tsx
-│
-└── lib/
-    ├── engine/                         ← Core analysis engine
-    │   ├── rule-engine.ts
-    │   ├── rule-packs/                 ← 10 rule packs × 3 files each
-    │   ├── drift-database.ts           ← Compatibility drift records
-    │   ├── certification.ts
-    │   ├── quality-gates.ts
-    │   └── fingerprint.ts
-    ├── parsers/                        ← Platform-specific parsers
-    │   ├── n8n.parser.ts
-    │   ├── make.parser.ts
-    │   ├── zapier.parser.ts
-    │   └── flowise.parser.ts
-    └── db/
-        ├── schema/                     ← Drizzle table definitions
-        ├── queries/                    ← DB query helpers
-        └── migrations/                 ← SQL migration files (commit these)
-```
-
----
-
-## Analysis Engine
-
-The engine is **deterministic** — the same workflow always produces the same score. No AI is used in the scoring pipeline.
-
-### 9 Score Dimensions
-
-| Dimension | What It Measures |
-|---|---|
-| Health | Overall structural correctness and completeness |
-| Security | Credentials, auth, injection risks, unsafe code |
-| Simplicity | Complexity, loop depth, branching factor |
-| Reliability | Error handling, retries, timeouts, fallbacks |
-| Debt | Legacy nodes, deprecated APIs, outdated patterns |
-| Memory | Node count, data volume, potential OOM risks |
-| Resilience | Recovery paths, webhook reliability, circuit breakers |
-| Privacy | PII detection, data flow to external services |
-| AI Guardrails | Prompt injection, missing limits, unsafe tool use |
-
-### 5 Quality Gates
-
-A workflow must pass **all 5 gates** to earn FlowIntel Certification:
-
-| Gate | Description |
-|---|---|
-| Security Gate | No CRITICAL security flags |
-| Production Gate | Health ≥ 70, Reliability ≥ 60 |
-| Marketplace Gate | FQI ≥ 80, Security ≥ 80, no CRITICAL flags |
-| Reliability Gate | Reliability ≥ 70, Resilience ≥ 60 |
-| Enterprise Gate | All scores ≥ 80, AI Guardrails pass |
-
-### Compatibility Drift
-
-Every workflow is checked against documented platform changes:
-
-- Deprecated node types (e.g. `n8n-nodes-base.function` → Code node)
-- Breaking typeVersion changes (e.g. HTTP Request v2 removed in n8n v1.0)
-- Deprecated AI models (e.g. `gpt-3.5-turbo-0301`)
-- Webhook auth policy changes
-- Expression syntax migrations (`$items()` → `$input.all()`)
-
-Every finding includes the official documentation URL and a confidence score (1–3).
-
----
-
-## API Reference
-
-### Analyze a workflow
-```bash
-POST /api/parse
-Content-Type: application/json
-
-{ "json": <workflow_json>, "save": true, "isPublic": true }
-```
-
-### CI/CD audit
-```bash
-POST /api/v1/audit
-Content-Type: application/json
-
-{ "json": <workflow_json> }
-# Returns: { pass: boolean, fqi: number, violations: [...] }
-```
-
-### Search catalog
-```bash
-GET /api/workflows?q=discord+bot&platform=N8N&fqiMin=80&certifiedOnly=true
-```
-
-### Engagement counters
-```bash
-POST /api/workflows/:slug/engage
-{ "action": "view" | "download" | "bookmark" }
-```
-
-### SVG Badge
-```bash
-GET /api/badge/:slug/security.svg
-GET /api/badge/:slug/fqi.svg
-GET /api/badge/:slug/health.svg
-```
-
----
-
-## Testing
-
-```bash
-# Scoring simulation (56 cases)
-bun run test:score
-
-# Security detection (7 cases)
-bun run test:detect
-
-# AI guardrails (17 cases)
-bun run test:ai
-```
-
-All 80 tests must pass before any deploy.
-
----
-
-## Database Migrations
-
-```bash
-# Generate a new migration from schema changes
-bun run db:generate
-
-# Apply all pending migrations
-bun run db:migrate
-
-# Open Drizzle Studio (DB GUI)
-bun run db:studio
-```
-
-Migration files live in `src/lib/db/migrations/` — **always commit these to git**.
-
----
-
-## License
-
-GNU GPL v3.0
-
-
-> Built with ❤️ by [Aman Gautam](https://github.com/Aman-Gautam67) and [Jivaansh Yadav](https://github.com/Jivaansh-Yadav)
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:070617,55:1e1b4b,100:6366f1&height=110&section=footer&reversal=true" alt="" width="100%">
